@@ -1,0 +1,76 @@
+# ============================================================================
+# RA-RL-IDS Configuration
+# Resource-Aware Reinforcement Learning IDS for IoMT Networks
+# ============================================================================
+# This is the single source of truth for all paths, hyperparameters,
+# and experimental settings. No magic numbers should appear in code.
+# ============================================================================
+
+# --- Reproducibility ---
+seed: 42
+
+# --- Paths ---
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  results: "results"
+  figures: "results/figures"
+  checkpoints: "checkpoints"
+  log_file: "ra-rl-ids.log"
+
+# --- Dataset ---
+dataset:
+  # Number of synthetic samples to generate if real CSVs are absent
+  synthetic_total_samples: 50000
+  # Number of top features to select via mutual information
+  num_features: 25
+  # Train / Validation / Test split ratios
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  # Label column name in CICIoMT2024 CSVs
+  label_column: "label"
+
+# --- Environment ---
+environment:
+  # "flat" or "weighted"
+  reward_mode: "flat"
+  # Penalty multiplier for weighted reward false negatives
+  penalty_factor: 2.0
+
+# --- Model Architecture ---
+model:
+  # CNN-LSTM Feature Extractor
+  cnn_out_channels: 64
+  cnn_kernel_size: 3
+  lstm_hidden_size: 128
+  lstm_num_layers: 1
+  dropout: 0.2
+  # DQN Head
+  dqn_hidden_size: 128
+
+# --- Training Hyperparameters ---
+training:
+  num_episodes: 200
+  max_steps_per_episode: 1000
+  batch_size: 64
+  learning_rate: 0.001
+  gamma: 0.99                    # Discount factor
+  epsilon_start: 1.0             # Initial exploration rate
+  epsilon_end: 0.01              # Minimum exploration rate
+  epsilon_decay: 0.995           # Multiplicative decay per episode
+  replay_buffer_capacity: 10000
+  target_update_frequency: 10    # Update target network every N episodes
+  eval_frequency: 10             # Evaluate every N episodes
+
+# --- Compression Benchmark ---
+compression:
+  num_inference_samples: 1000    # Number of samples for latency measurement
+  warmup_samples: 50             # Warmup runs to discard before timing
+  latency_budget_ms: 50.0        # Real-time budget for IoMT devices
+
+# --- Logging ---
+logging:
+  level: "INFO"
+  max_bytes: 5242880             # 5 MB
+  backup_count: 3

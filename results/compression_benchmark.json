@@ -1,0 +1,71 @@
+{
+  "uncompressed": {
+    "model_size_mb": 0.5207,
+    "latency": {
+      "avg_latency_ms": 1.9015,
+      "std_latency_ms": 0.3063,
+      "min_latency_ms": 1.4239,
+      "max_latency_ms": 7.0733,
+      "p95_latency_ms": 2.1805
+    },
+    "peak_memory_mb": 0.0034,
+    "accuracy": 0.2483,
+    "f1_macro": 0.1573,
+    "per_class_recall": {
+      "Benign": 0.4529,
+      "DDoS-ICMP_Flood": 0.268,
+      "DDoS-PSHACK_Flood": 0.1219,
+      "DDoS-SYN_Flood": 0.0578,
+      "DDoS-SynonymousIP_Flood": 0.2967,
+      "DDoS-TCP_Flood": 0.0607,
+      "DDoS-UDP_Flood": 0.1267,
+      "DoS-SYN_Flood": 0.0889,
+      "DoS-TCP_Flood": 0.2853,
+      "DoS-UDP_Flood": 0.18,
+      "MQTT-Publish": 0.0667,
+      "Recon-HostDiscovery": 0.0533,
+      "Recon-OSScan": 0.2655,
+      "Recon-PortScan": 0.0667,
+      "Spoofing-ARP": 0.1875,
+      "Spoofing-DNS": 0.5333
+    }
+  },
+  "quantized": {
+    "model_size_mb": 0.1421,
+    "latency": {
+      "avg_latency_ms": 3.0599,
+      "std_latency_ms": 0.2215,
+      "min_latency_ms": 2.6598,
+      "max_latency_ms": 5.5076,
+      "p95_latency_ms": 3.4132
+    },
+    "peak_memory_mb": 0.0045,
+    "accuracy": 0.2473,
+    "f1_macro": 0.1567,
+    "per_class_recall": {
+      "Benign": 0.4453,
+      "DDoS-ICMP_Flood": 0.2827,
+      "DDoS-PSHACK_Flood": 0.1333,
+      "DDoS-SYN_Flood": 0.0489,
+      "DDoS-SynonymousIP_Flood": 0.2933,
+      "DDoS-TCP_Flood": 0.0563,
+      "DDoS-UDP_Flood": 0.1233,
+      "DoS-SYN_Flood": 0.0844,
+      "DoS-TCP_Flood": 0.296,
+      "DoS-UDP_Flood": 0.1933,
+      "MQTT-Publish": 0.08,
+      "Recon-HostDiscovery": 0.0489,
+      "Recon-OSScan": 0.2478,
+      "Recon-PortScan": 0.0533,
+      "Spoofing-ARP": 0.1875,
+      "Spoofing-DNS": 0.5333
+    }
+  },
+  "comparison": {
+    "size_reduction_pct": 72.7,
+    "latency_reduction_pct": -60.92,
+    "accuracy_drop_pct": 0.1,
+    "meets_latency_budget": true,
+    "latency_budget_ms": 50.0
+  }
+}

@@ -1,0 +1,41 @@
+# RA-RL-IDS: Gitignore
+# Virtual environment
+venv/
+.venv/
+
+# Raw dataset (large CSVs)
+data/raw/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Model checkpoints (large .pt files)
+checkpoints/*.pt
+results/*.pt
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Byte-compiled
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
