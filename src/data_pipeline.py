@@ -219,9 +219,9 @@ def clean_dataframe(df: pd.DataFrame, label_column: str = "label") -> pd.DataFra
     # Keep only numeric columns
     features = features.select_dtypes(include=[np.number])
 
-    # Replace infinities with NaN, then fill NaN with column median
-    features.replace([np.inf, -np.inf], np.nan, inplace=True)
-    features.fillna(features.median(), inplace=True)
+    # Replace infinities with NaN, then fill NaN with column median, fallback to 0.0
+    features = features.replace([np.inf, -np.inf], np.nan)
+    features = features.fillna(features.median()).fillna(0.0)
 
     # Drop columns that are constant (zero variance)
     non_constant = features.columns[features.std() > 1e-10]
@@ -318,32 +318,43 @@ def run_pipeline(config: Dict[str, Any]) -> Dict[str, Any]:
     X = df[feature_cols].values.astype(np.float32)
     y = df[label_col].values.astype(np.int64)
 
-    # ---- 5. Scale ----
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X).astype(np.float32)
-
-    # ---- 6. Feature selection ----
-    X, selected_features, _ = select_features(
-        X, y, feature_cols,
-        num_features=ds_cfg["num_features"],
-        seed=seed,
-    )
-
-    # ---- 7. Stratified split ----
+    # ---- 5. Stratified split (Before scaling/feature selection to avoid data leakage) ----
     train_ratio = ds_cfg["train_ratio"]
     val_ratio = ds_cfg["val_ratio"]
     test_ratio = ds_cfg["test_ratio"]
 
-    X_train, X_temp, y_train, y_temp = train_test_split(
+    X_train_raw, X_temp_raw, y_train, y_temp = train_test_split(
         X, y, test_size=(val_ratio + test_ratio), stratify=y, random_state=seed
     )
     relative_test = test_ratio / (val_ratio + test_ratio)
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_temp, y_temp, test_size=relative_test, stratify=y_temp, random_state=seed
+    X_val_raw, X_test_raw, y_val, y_test = train_test_split(
+        X_temp_raw, y_temp, test_size=relative_test, stratify=y_temp, random_state=seed
+    )
+
+    # ---- 6. Scale (fit ONLY on X_train to prevent data leakage) ----
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train_raw).astype(np.float32)
+    X_val = scaler.transform(X_val_raw).astype(np.float32)
+    X_test = scaler.transform(X_test_raw).astype(np.float32)
+
+    # ---- 7. Feature selection (fit ONLY on X_train, y_train) ----
+    num_features_to_select = min(ds_cfg["num_features"], X_train.shape[1])
+    mi_scores = mutual_info_classif(X_train, y_train, random_state=seed)
+    top_indices = np.argsort(mi_scores)[::-1][:num_features_to_select]
+    selected_features = [feature_cols[i] for i in top_indices]
+
+    X_train = X_train[:, top_indices]
+    X_val = X_val[:, top_indices]
+    X_test = X_test[:, top_indices]
+
+    logger.info(
+        "Selected top %d features by mutual information (top-3: %s)",
+        num_features_to_select,
+        selected_features[:3],
     )
 
     logger.info(
-        "Split sizes — train: %d, val: %d, test: %d",
+        "Split sizes - train: %d, val: %d, test: %d",
         len(X_train), len(X_val), len(X_test),
     )
 

@@ -142,7 +142,8 @@ def train_dqn(
         done = False
 
         while not done:
-            # Select action
+            # Select action (eval mode for single-sample BatchNorm stability)
+            policy_net.eval()
             state_tensor = torch.FloatTensor(state).unsqueeze(0).to(device)
             with torch.no_grad():
                 q_values = policy_net(state_tensor)
@@ -163,6 +164,7 @@ def train_dqn(
 
             # ---- DQN update ----
             if len(replay_buffer) >= batch_size:
+                policy_net.train()
                 batch = replay_buffer.sample(batch_size)
                 states_b = torch.FloatTensor(
                     np.array([e.state for e in batch])

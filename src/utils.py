@@ -127,11 +127,11 @@ def get_device() -> torch.device:
     if torch.cuda.is_available():
         device = torch.device("cuda")
         logging.getLogger("ra_rl_ids").info(
-            "CUDA available — using GPU: %s", torch.cuda.get_device_name(0)
+            "CUDA available - using GPU: %s", torch.cuda.get_device_name(0)
         )
     else:
         device = torch.device("cpu")
-        logging.getLogger("ra_rl_ids").info("CUDA not available — using CPU")
+        logging.getLogger("ra_rl_ids").info("CUDA not available - using CPU")
     return device
 
 
