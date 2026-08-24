@@ -9,8 +9,7 @@ This document provides a detailed description of the **CICIoMT2024** dataset uti
 *   **Dataset Name**: CICIoMT2024 (Attack vectors in healthcare devices - a multi-protocol dataset for assessing IoMT device security)
 *   **Publisher**: Canadian Institute for Cybersecurity (CIC), University of New Brunswick (UNB)
 *   **Year**: 2024
-*   **Citation**: *Dadkhah, S. et al. (2024). "CICIoMT2024: Attack vectors in healthcare devices – a multi-protocol dataset for assessing IoMT device security," Internet of Things.* [DOI: 10.1016/j.iot.2024.101351](https://doi.org/10.1016/j.iot.2024.101351)
-*   **Overview**: Modern healthcare systems rely on Internet of Medical Things (IoMT) devices (e.g., patient monitors, infusion pumps, BLE heart-rate monitors) operating under diverse network protocols. Prior security datasets (like KDD99 or CICIDS2017) represent standard IT networks and fail to capture specific IoMT protocols like MQTT or BLE. CICIoMT2024 addresses this gap by capturing real-world multi-protocol network traffic (Wi-Fi, Bluetooth/BLE, and MQTT) under 15 distinct attack scenarios and normal clinical operations.
+*   **Overview**: CICIoMT2024 is the sole dataset used in this project. It captures real-world healthcare network traffic across diverse IoMT protocols (Wi-Fi, Bluetooth/BLE, and MQTT) for 40+ medical devices, featuring 15 distinct attack scenarios alongside normal clinical telemetry.
 
 ---
 
