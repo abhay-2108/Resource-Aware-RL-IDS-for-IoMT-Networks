@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RA-RL-IDS — Page 2: Results, Figures & Inferences</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- MathJax for LaTeX Equation Rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
 </head>
 <body>
 
@@ -356,10 +372,10 @@
       <div style="display: flex; flex-direction: column; gap: 16px;">
         <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px; border-left: 4px solid var(--accent-indigo);">
           <h4 style="color: var(--accent-indigo); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
-            Q1: Why does &gamma; = 0.0 work better than &gamma; = 0.99 for network packet classification?
+            Q1: Why does $\gamma = 0.0$ work better than $\gamma = 0.99$ for network packet classification?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Packet classification is a 1-step contextual decision rather than a multi-step sequential state trajectory. Setting &gamma; = 0.99 causes Q-values to accumulate unbounded future rewards over infinite horizon (Q &gt; 500), exploding output logits. Setting &gamma; = 0.0 bounds Q-values strictly to [-1, +1] logit space, stabilizing exploration.
+            <strong>Inference</strong>: Packet classification is a 1-step contextual decision rather than a multi-step sequential state trajectory. Setting $\gamma = 0.99$ causes Q-values to accumulate unbounded future rewards over infinite horizon ($Q > 500$), exploding output logits. Setting $\gamma = 0.0$ bounds Q-values strictly to $[-1, +1]$ logit space, stabilizing exploration.
           </p>
         </div>
 
@@ -368,7 +384,7 @@
             Q2: Why did Selective Linear Quantization outperform Full Dynamic Quantization?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Recurrent LSTM cells propagate hidden states (h_t, c_t) across sequence steps. Full dynamic INT8 quantization on LSTM weights accumulates rounding noise across time steps, dropping classification accuracy down to 62%. Quantizing strictly <code>nn.Linear</code> layers keeps LSTM parameters in FP32, achieving 0.44 MB model size with <strong>zero accuracy loss (85.84%)</strong>.
+            <strong>Inference</strong>: Recurrent LSTM cells propagate hidden states $(h_t, c_t)$ across sequence steps. Full dynamic INT8 quantization on LSTM weights accumulates rounding noise across time steps, dropping classification accuracy down to 62%. Quantizing strictly <code>nn.Linear</code> layers keeps LSTM parameters in FP32, achieving 0.44 MB model size with <strong>zero accuracy loss (85.84%)</strong>.
           </p>
         </div>
 
@@ -377,7 +393,7 @@
             Q3: How does Supervised Warm-Start Pretraining assist Reinforcement Learning?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Standard DRL starting with random weights (&epsilon; = 1.0) fills the replay buffer with 100% random predictions, corrupting feature representations. Pretraining the feature extractor for 15 epochs provides a 76.08% warm start, allowing DRL exploration at &epsilon; = 0.15 to refine decision boundaries upward to 85.84%.
+            <strong>Inference</strong>: Standard DRL starting with random weights ($\epsilon = 1.0$) fills the replay buffer with 100% random predictions, corrupting feature representations. Pretraining the feature extractor for 15 epochs provides a 76.08% warm start, allowing DRL exploration at $\epsilon = 0.15$ to refine decision boundaries upward to 85.84%.
           </p>
         </div>
       </div>

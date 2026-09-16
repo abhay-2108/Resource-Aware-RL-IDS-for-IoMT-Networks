@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RA-RL-IDS — Page 1: Methodology & System Design</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- MathJax for LaTeX Equation Rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
 </head>
 <body>
 
@@ -64,31 +80,31 @@
         Custom Gymnasium RL Environment Formulation (IoMTIDSEnv)
       </h2>
       <p style="color: var(--text-secondary); margin-bottom: 20px;">
-        We frame tabular network flow classification as a <strong>1-Step Contextual Markov Decision Process (MDP)</strong> defined by the 5-tuple <code>&lang; S, A, P, R, &gamma; &rang;</code> built on top of the <code>gymnasium.Env</code> interface:
+        We frame tabular network flow classification as a <strong>1-Step Contextual Markov Decision Process (MDP)</strong> defined by the 5-tuple $\langle S, A, P, R, \gamma \rangle$ built on top of the <code>gymnasium.Env</code> interface:
       </p>
 
       <div class="grid-2" style="margin-bottom: 20px;">
         <div style="background: rgba(79, 70, 229, 0.04); border: 1px solid rgba(79, 70, 229, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-indigo); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
-            📐 Observation Space (State S)
+            📐 Observation Space (State $S$)
           </h3>
           <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
             <code>gymnasium.spaces.Box(low=-inf, high=inf, shape=(25,), dtype=np.float32)</code>
           </p>
           <p style="font-size: 0.85rem; color: var(--text-muted);">
-            A continuous 25-dimensional feature vector representing a single network packet flow (IP flags, packet inter-arrival times, header lengths, and port rates) standardized via Z-score scaling (&mu;=0, &sigma;=1).
+            A continuous 25-dimensional feature vector $s \in \mathbb{R}^{25}$ representing a single network packet flow (IP flags, inter-arrival times, header lengths, port rates) standardized via Z-score scaling ($\mu=0, \sigma=1$).
           </p>
         </div>
 
         <div style="background: rgba(5, 150, 105, 0.04); border: 1px solid rgba(5, 150, 105, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
-            🎮 Action Space (Action A)
+            🎮 Action Space (Action $A$)
           </h3>
           <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
             <code>gymnasium.spaces.Discrete(19)</code>
           </p>
           <p style="font-size: 0.85rem; color: var(--text-muted);">
-            19 discrete classification choices: <code>0</code>: Benign traffic, <code>1–18</code>: Specific IoMT attack categories (e.g., DoS-ICMP, MQTT Publish Flood, Spoofing-ARP, Recon-PortScan).
+            19 discrete classification choices $a \in \{0, 1, \dots, 18\}$: $0$: Benign traffic, $1–18$: Specific IoMT attack categories (e.g., DoS-ICMP, MQTT Publish Flood, Spoofing-ARP, Recon-PortScan).
           </p>
         </div>
       </div>
@@ -96,23 +112,23 @@
       <div class="grid-2">
         <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid rgba(124, 58, 237, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
-            🔄 State Transitions & Discount (&gamma;=0.0)
+            🔄 State Transitions & Discount ($\gamma=0.0$)
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            <strong>Contextual Bandit Setup</strong>: Setting discount factor <code>&gamma; = 0.0</code> models flow classification as a 1-step contextual decision. Eliminates infinite Q-value accumulation (which caused Q > 500 under &gamma;=0.99) and keeps Q-values strictly in <code>[-1, +1]</code> logit margin space.
+            <strong>Contextual Bandit Setup</strong>: Setting discount factor $\gamma = 0.0$ models flow classification as a 1-step contextual decision. Eliminates infinite Q-value accumulation ($Q > 500$ under $\gamma=0.99$) and maintains Q-scores strictly in $[-1, +1]$ logit margin space.
           </p>
         </div>
 
         <div style="background: rgba(217, 119, 6, 0.04); border: 1px solid rgba(217, 119, 6, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
-            ⚖️ Balanced Focal Reward Function (R)
+            ⚖️ Balanced Focal Reward Function ($R$)
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            Uses square-root smoothed inverse class weights <code>w_c = &radic;(N / N_c)</code> normalized.<br>
-            • Correct Prediction: <code>r = +w_true_class</code><br>
-            • Misclassification: <code>r = -w_true_class &times; penalty_factor</code><br>
-            Penalizes false negatives on rare attacks heavily without destabilizing majority benign traffic.
+            Normalized square-root inverse class weights $w_c = \sqrt{\frac{N}{N_c}}$:
           </p>
+          <div style="margin-top: 8px; font-size: 0.9rem;">
+            $$r(s, a) = \begin{cases} +w_{\text{true\_class}} & \text{if } a = y_{\text{true}} \\ -w_{\text{true\_class}} \times \text{penalty} & \text{if } a \neq y_{\text{true}} \end{cases}$$
+          </div>
         </div>
       </div>
     </section>
@@ -216,33 +232,33 @@
       <div class="grid-2" style="margin-bottom: 20px;">
         <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-indigo); font-family: var(--font-heading); margin-bottom: 6px;">Dueling Q-Stream Decoupling</h4>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            Splits Q-computation into scalar <strong>State Value V(s)</strong> (general flow risk) and <strong>Action Advantage A(s,a)</strong> (relative class logit):<br>
-            <code>Q(s,a) = V(s) + ( A(s,a) - (1/19) &sum; A(s,a') )</code>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+            Splits Q-computation into scalar <strong>State Value $V(s)$</strong> (general flow risk) and <strong>Action Advantage $A(s,a)$</strong> (relative class logit):
           </p>
+          $$Q(s, a; \theta, \alpha, \beta) = V(s; \theta, \beta) + \left( A(s, a; \theta, \alpha) - \frac{1}{|A|} \sum_{a'} A(s, a'; \theta, \alpha) \right)$$
         </div>
 
         <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 6px;">Double Q-Learning Target (DDQN)</h4>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            Uses Policy Net &theta; for action selection and Target Net &theta;<sup>-</sup> for Q-evaluation, removing positive maximization bias:<br>
-            <code>Y_t = r_t + &gamma; Q(s', argmax_a Q(s', a; &theta;); &theta;^-)</code>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+            Uses Policy Net $\theta$ for action selection and Target Net $\theta^-$ for Q-evaluation, removing positive maximization bias:
           </p>
+          $$Y_t^{\text{DDQN}} = r_t + \gamma \, Q\left(s_{t+1}, \arg\max_{a} Q(s_{t+1}, a; \theta); \theta^-\right)$$
         </div>
       </div>
 
       <div class="grid-2">
         <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
-          <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 6px;">Warm-Start &epsilon;-Greedy Exploration</h4>
+          <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 6px;">Warm-Start $\epsilon$-Greedy Exploration</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            Starts exploration at <code>&epsilon; = 0.15</code> (after 15 pretraining epochs) decaying at rate <code>0.98</code> down to <code>&epsilon;_min = 0.01</code>. Preserves pretrained feature representations while refining boundaries.
+            Starts exploration at $\epsilon = 0.15$ (after 15 pretraining epochs) decaying at rate $0.98$ down to $\epsilon_{\text{min}} = 0.01$. Preserves pretrained feature representations while refining boundaries.
           </p>
         </div>
 
         <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 6px;">Experience Replay & SGD Frequency</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            Maintains a FIFO transition buffer of capacity 10,000. Executes SGD updates every 4 steps (<code>step % 4 == 0</code>) using Huber Loss (<code>SmoothL1Loss</code>) and AdamW optimizer (LR = 10<sup>-3</sup>).
+            Maintains a FIFO transition buffer of capacity 10,000. Executes SGD updates every 4 steps ($\text{step} \pmod 4 == 0$) using Huber Loss ($\text{SmoothL1Loss}$) and AdamW optimizer ($\text{LR} = 10^{-3}$).
           </p>
         </div>
       </div>
@@ -318,32 +334,32 @@
           <tbody>
             <tr>
               <td><strong>Overall Accuracy</strong></td>
-              <td><code>Acc = (TP + TN) / (TP + TN + FP + FN)</code></td>
+              <td>$$\text{Acc} = \frac{TP + TN}{TP + TN + FP + FN}$$</td>
               <td>Overall flow classification ratio across all 130,000 samples</td>
             </tr>
             <tr>
               <td><strong>Macro Precision</strong></td>
-              <td><code>P_macro = (1/K) * ∑ (TP_k / (TP_k + FP_k))</code></td>
+              <td>$$P_{\text{macro}} = \frac{1}{K} \sum_{k=1}^{K} \frac{TP_k}{TP_k + FP_k}$$</td>
               <td>Unweighted average precision across all 19 attack classes</td>
             </tr>
             <tr>
               <td><strong>Macro Recall</strong></td>
-              <td><code>R_macro = (1/K) * ∑ (TP_k / (TP_k + FN_k))</code></td>
+              <td>$$R_{\text{macro}} = \frac{1}{K} \sum_{k=1}^{K} \frac{TP_k}{TP_k + FN_k}$$</td>
               <td>Primary detector metric measuring rare minority attack sensitivity</td>
             </tr>
             <tr>
               <td><strong>Macro F1-Score</strong></td>
-              <td><code>F1_macro = 2 * (P_macro * R_macro) / (P_macro + R_macro)</code></td>
+              <td>$$F1_{\text{macro}} = 2 \cdot \frac{P_{\text{macro}} \cdot R_{\text{macro}}}{P_{\text{macro}} + R_{\text{macro}}}$$</td>
               <td>Balanced quality indicator across imbalanced class distributions</td>
             </tr>
             <tr>
               <td><strong>Weighted F1-Score</strong></td>
-              <td><code>F1_weighted = ∑ (N_k / N_total) * F1_k</code></td>
+              <td>$$F1_{\text{weighted}} = \sum_{k=1}^{K} \frac{N_k}{N_{\text{total}}} \cdot F1_k$$</td>
               <td>Class-proportionate evaluation reflecting deployment flow density</td>
             </tr>
             <tr>
               <td><strong>CPU Inference Latency</strong></td>
-              <td><code>Latency = (1/N) * ∑ (t_end - t_start)</code></td>
+              <td>$$\text{Latency} = \frac{1}{N} \sum_{i=1}^{N} (t_{\text{end}} - t_{\text{start}})$$</td>
               <td>Single-sample single-core CPU execution time (ms)</td>
             </tr>
           </tbody>

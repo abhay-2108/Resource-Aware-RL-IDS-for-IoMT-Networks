@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RA-RL-IDS — Resource-Aware RL IDS for IoMT Networks</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- MathJax for LaTeX Equation Rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
 </head>
 <body>
 
@@ -76,7 +92,7 @@
             Page 1: Methodology, Metrics & Architecture
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px;">
-            Detailed technical breakdown of the Gymnasium RL Environment formulation, D3QN Agent architecture, 5 integrated optimization strategies, and system interaction loop.
+            Detailed technical breakdown of the Gymnasium RL Environment formulation ($\langle S,A,P,R,\gamma \rangle$), D3QN Agent architecture, 5 integrated optimization strategies, and system interaction loop.
           </p>
           <span style="color: var(--accent-indigo); font-weight: 700; font-size: 0.9rem;">View Methodology Page →</span>
         </div>
