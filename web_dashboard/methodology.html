@@ -23,10 +23,10 @@
   <div class="container">
     <!-- Hero Header -->
     <header class="hero">
-      <div class="hero-badge">⚡ Page 1: Methodology, Metrics & Architecture</div>
+      <div class="hero-badge">⚡ Page 1: RL Environment, Agent Architecture & Design</div>
       <h1 class="hero-title">Resource-Aware D3QN Framework for IoMT Intrusion Detection</h1>
       <p class="hero-subtitle">
-        A deep reinforcement learning framework addressing class imbalance and edge deployability constraints in Internet of Medical Things (IoMT) networks using 5 integrated optimization strategies.
+        A deep reinforcement learning framework addressing class imbalance and edge deployability constraints in Internet of Medical Things (IoMT) networks using a custom Gymnasium MDP environment and Dueling Double DQN agent.
       </p>
     </header>
 
@@ -57,87 +57,153 @@
       </div>
     </section>
 
-    <!-- Section 2: System Architecture -->
+    <!-- Section 2: Custom Gymnasium RL Environment Formulation -->
     <section class="card">
       <h2 class="card-title">
-        <span class="card-icon">🧠</span>
-        Neural Network Architecture (Conv1D + LSTM + Dueling Streams)
+        <span class="card-icon">🌐</span>
+        Custom Gymnasium RL Environment Formulation (IoMTIDSEnv)
       </h2>
       <p style="color: var(--text-secondary); margin-bottom: 20px;">
-        To process tabular flow features as sequential representations without spatial feature loss, our policy network combines a 1D Convolutional filter, a Recurrent LSTM cell, and a Dueling Q-head:
+        We frame tabular network flow classification as a <strong>1-Step Contextual Markov Decision Process (MDP)</strong> defined by the 5-tuple <code>&lang; S, A, P, R, &gamma; &rang;</code> built on top of the <code>gymnasium.Env</code> interface:
       </p>
 
-      <!-- SVG System Architecture Diagram -->
-      <div style="background: #050811; border: 1px solid var(--border-card); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 20px;">
-        <svg viewBox="0 0 900 240" style="width: 100%; height: auto;">
-          <defs>
-            <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f2fe" />
-              <stop offset="100%" stop-color="#4facfe" />
-            </linearGradient>
-            <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#7f00ff" />
-              <stop offset="100%" stop-color="#e100ff" />
-            </linearGradient>
-          </defs>
+      <div class="grid-2" style="margin-bottom: 20px;">
+        <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            📐 Observation Space (State S)
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
+            <code>gymnasium.spaces.Box(low=-inf, high=inf, shape=(25,), dtype=np.float32)</code>
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            A continuous 25-dimensional feature vector representing a single network packet flow (IP flags, packet inter-arrival times, header lengths, and port rates) standardized via Z-score scaling (&mu;=0, &sigma;=1).
+          </p>
+        </div>
 
-          <!-- Input Node -->
-          <rect x="20" y="80" width="130" height="80" rx="10" fill="rgba(30, 41, 59, 0.9)" stroke="#4facfe" stroke-width="2"/>
-          <text x="85" y="115" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">Input Flow</text>
-          <text x="85" y="135" fill="#94a3b8" font-size="11" text-anchor="middle">25 Selected Features</text>
-
-          <!-- Arrow 1 -->
-          <path d="M 150 120 L 190 120" stroke="#00f2fe" stroke-width="2" marker-end="url(#arrow)"/>
-
-          <!-- Conv1D -->
-          <rect x="195" y="80" width="140" height="80" rx="10" fill="rgba(0, 242, 254, 0.1)" stroke="#00f2fe" stroke-width="2"/>
-          <text x="265" y="115" fill="#00f2fe" font-size="13" font-weight="700" text-anchor="middle">1D CNN Layer</text>
-          <text x="265" y="135" fill="#94a3b8" font-size="11" text-anchor="middle">Spatial Header Filters</text>
-
-          <!-- Arrow 2 -->
-          <path d="M 335 120 L 375 120" stroke="#00f2fe" stroke-width="2"/>
-
-          <!-- LSTM -->
-          <rect x="380" y="80" width="140" height="80" rx="10" fill="rgba(127, 0, 255, 0.1)" stroke="#7f00ff" stroke-width="2"/>
-          <text x="450" y="115" fill="#e100ff" font-size="13" font-weight="700" text-anchor="middle">LSTM Recurrent Cell</text>
-          <text x="450" y="135" fill="#94a3b8" font-size="11" text-anchor="middle">Temporal Sequence Modeling</text>
-
-          <!-- Arrow Split -->
-          <path d="M 520 120 L 560 70" stroke="#4facfe" stroke-width="2"/>
-          <path d="M 520 120 L 560 170" stroke="#4facfe" stroke-width="2"/>
-
-          <!-- Value Stream -->
-          <rect x="565" y="35" width="140" height="60" rx="8" fill="rgba(0, 245, 160, 0.1)" stroke="#00f5a0" stroke-width="1.5"/>
-          <text x="635" y="62" fill="#00f5a0" font-size="12" font-weight="700" text-anchor="middle">State Value V(s)</text>
-          <text x="635" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">Scalar State Score</text>
-
-          <!-- Advantage Stream -->
-          <rect x="565" y="145" width="140" height="60" rx="8" fill="rgba(255, 183, 3, 0.1)" stroke="#ffb703" stroke-width="1.5"/>
-          <text x="635" y="172" fill="#ffb703" font-size="12" font-weight="700" text-anchor="middle">Advantage A(s,a)</text>
-          <text x="635" y="188" fill="#94a3b8" font-size="10" text-anchor="middle">Action Relative Payoff</text>
-
-          <!-- Combine Arrow -->
-          <path d="M 705 65 L 745 110" stroke="#00f2fe" stroke-width="2"/>
-          <path d="M 705 175 L 745 130" stroke="#00f2fe" stroke-width="2"/>
-
-          <!-- Final Q Output -->
-          <rect x="750" y="80" width="130" height="80" rx="10" fill="url(#gradCyan)"/>
-          <text x="815" y="115" fill="#0b0f19" font-size="13" font-weight="800" text-anchor="middle">Q(s,a) Logits</text>
-          <text x="815" y="135" fill="#0b0f19" font-size="11" font-weight="600" text-anchor="middle">19 Attack Classes</text>
-        </svg>
+        <div style="background: rgba(0, 245, 160, 0.04); border: 1px solid rgba(0, 245, 160, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            🎮 Action Space (Action A)
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
+            <code>gymnasium.spaces.Discrete(19)</code>
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            19 discrete classification choices: <code>0</code>: Benign traffic, <code>1–18</code>: Specific IoMT attack categories (e.g., DoS-ICMP, MQTT Publish Flood, Spoofing-ARP, Recon-PortScan).
+          </p>
+        </div>
       </div>
 
-      <div class="code-box">
-        // Dueling Q-Value Combination Formula:<br>
-        Q(s, a; &theta;, &alpha;, &beta;) = V(s; &theta;, &beta;) + ( A(s, a; &theta;, &alpha;) - &frac119; &sum;<sub>a'</sub> A(s, a'; &theta;, &alpha;) )
+      <div class="grid-2">
+        <div style="background: rgba(127, 0, 255, 0.04); border: 1px solid rgba(127, 0, 255, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            🔄 State Transitions & Discount (&gamma;=0.0)
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            <strong>Contextual Bandit Setup</strong>: Setting discount factor <code>&gamma; = 0.0</code> models flow classification as a 1-step contextual decision. Eliminates infinite Q-value accumulation (which caused Q > 500 under &gamma;=0.99) and keeps Q-values strictly in <code>[-1, +1]</code> logit margin space.
+          </p>
+        </div>
+
+        <div style="background: rgba(255, 183, 3, 0.04); border: 1px solid rgba(255, 183, 3, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            ⚖️ Balanced Focal Reward Function (R)
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Uses square-root smoothed inverse class weights <code>w_c = &radic;(N / N_c)</code> normalized.<br>
+            • Correct Prediction: <code>r = +w_true_class</code><br>
+            • Misclassification: <code>r = -w_true_class &times; penalty_factor</code><br>
+            Penalizes false negatives on rare attacks heavily without destabilizing majority benign traffic.
+          </p>
+        </div>
       </div>
     </section>
 
-    <!-- Section 3: The 5 Technical Enhancement Strategies -->
+    <!-- Section 3: RL Agent-Environment Interaction Diagram -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🔄</span>
+        RL Agent-Environment Interaction Loop
+      </h2>
+
+      <!-- SVG Agent-Environment Loop Diagram -->
+      <div style="background: #050811; border: 1px solid var(--border-card); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 20px;">
+        <svg viewBox="0 0 900 240" style="width: 100%; height: auto;">
+          <!-- Environment Box -->
+          <rect x="50" y="70" width="220" height="100" rx="12" fill="rgba(0, 242, 254, 0.08)" stroke="#00f2fe" stroke-width="2"/>
+          <text x="160" y="105" fill="#00f2fe" font-size="14" font-weight="800" text-anchor="middle">IoMT Gymnasium Env</text>
+          <text x="160" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">IoMTIDSEnv (25 Features)</text>
+          <text x="160" y="145" fill="#64748b" font-size="10" text-anchor="middle">Contextual Flow Sampling</text>
+
+          <!-- Action Arrow (Top) -->
+          <path d="M 630 85 L 270 85" stroke="#ffb703" stroke-width="2.5" marker-end="url(#arrow)"/>
+          <text x="450" y="75" fill="#ffb703" font-size="12" font-weight="700" text-anchor="middle">Action a_t &in; {0, 1, ..., 18} (Classification)</text>
+
+          <!-- State/Reward Arrow (Bottom) -->
+          <path d="M 270 155 L 630 155" stroke="#00f5a0" stroke-width="2.5"/>
+          <text x="450" y="175" fill="#00f5a0" font-size="12" font-weight="700" text-anchor="middle">State s_t &amp; Focal Reward r_t (+w_c / -w_c)</text>
+
+          <!-- D3QN Agent Box -->
+          <rect x="630" y="70" width="220" height="100" rx="12" fill="rgba(127, 0, 255, 0.08)" stroke="#7f00ff" stroke-width="2"/>
+          <text x="740" y="105" fill="#e100ff" font-size="14" font-weight="800" text-anchor="middle">D3QN Agent</text>
+          <text x="740" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">CNN-LSTM + Dueling Q-Head</text>
+          <text x="740" y="145" fill="#64748b" font-size="10" text-anchor="middle">&epsilon;-Greedy Warm-Start Policy</text>
+
+          <!-- Replay Buffer Sub-Box -->
+          <rect x="350" y="195" width="200" height="35" rx="6" fill="rgba(30, 41, 59, 0.9)" stroke="#4facfe" stroke-width="1.5"/>
+          <text x="450" y="217" fill="#4facfe" font-size="11" font-weight="700" text-anchor="middle">Replay Buffer (10,000 Capacity)</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Section 4: Dueling Double DQN Agent Architecture -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🧠</span>
+        Dueling Double Deep Q-Network (D3QN) Agent Specifications
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        To eliminate overestimation bias and decouple state risk from specific attack actions, our agent implements a Dueling Double Q-learning architecture:
+      </p>
+
+      <div class="grid-2" style="margin-bottom: 20px;">
+        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 6px;">Dueling Q-Stream Decoupling</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Splits Q-computation into scalar <strong>State Value V(s)</strong> (general flow risk) and <strong>Action Advantage A(s,a)</strong> (relative class logit):<br>
+            <code>Q(s,a) = V(s) + ( A(s,a) - (1/19) &sum; A(s,a') )</code>
+          </p>
+        </div>
+
+        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 6px;">Double Q-Learning Target (DDQN)</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Uses Policy Net &theta; for action selection and Target Net &theta;<sup>-</sup> for Q-evaluation, removing positive maximization bias:<br>
+            <code>Y_t = r_t + &gamma; Q(s', argmax_a Q(s', a; &theta;); &theta;^-)</code>
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 6px;">Warm-Start &epsilon;-Greedy Exploration</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Starts exploration at <code>&epsilon; = 0.15</code> (after 15 pretraining epochs) decaying at rate <code>0.98</code> down to <code>&epsilon;_min = 0.01</code>. Preserves pretrained feature representations while refining boundaries.
+          </p>
+        </div>
+
+        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 6px;">Experience Replay & SGD Frequency</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Maintains a FIFO transition buffer of capacity 10,000. Executes SGD updates every 4 steps (<code>step % 4 == 0</code>) using Huber Loss (<code>SmoothL1Loss</code>) and AdamW optimizer (LR = 10<sup>-3</sup>).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: The 5 Technical Enhancement Strategies -->
     <section class="card">
       <h2 class="card-title">
         <span class="card-icon">⚙️</span>
-        The 5 Integrated Technical Enhancement Strategies
+        Summary of the 5 Integrated Optimization Strategies
       </h2>
       <div class="strategy-list">
 
@@ -184,7 +250,7 @@
       </div>
     </section>
 
-    <!-- Section 4: Formulated Metrics Definitions -->
+    <!-- Section 6: Formulated Metrics Definitions -->
     <section class="card">
       <h2 class="card-title">
         <span class="card-icon">📐</span>
@@ -237,7 +303,7 @@
     </section>
 
     <footer>
-      <p>RA-RL-IDS Framework — Page 1: Methodology, Metrics & Architecture | B.Tech Final Year Project</p>
+      <p>RA-RL-IDS Framework — Page 1: Methodology, RL Environment & Agent Architecture | B.Tech Final Year Project</p>
     </footer>
   </div>
 
