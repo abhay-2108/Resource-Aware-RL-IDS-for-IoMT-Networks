@@ -41,14 +41,14 @@
       </p>
 
       <div class="grid-2">
-        <div style="background: rgba(255,75,43,0.05); border: 1px solid rgba(255,75,43,0.2); padding: 20px; border-radius: 12px;">
+        <div style="background: rgba(225, 29, 72, 0.04); border: 1px solid rgba(225, 29, 72, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-rose); font-family: var(--font-heading); margin-bottom: 8px;">Gap A: The Deployability Gap</h3>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
             Existing deep learning IDS models report high accuracy on server GPUs but fail to evaluate edge constraints (CPU latency, memory footprint, storage size). Heavy models cannot execute on low-power medical microcontrollers.
           </p>
         </div>
 
-        <div style="background: rgba(255,183,3,0.05); border: 1px solid rgba(255,183,3,0.2); padding: 20px; border-radius: 12px;">
+        <div style="background: rgba(217, 119, 6, 0.04); border: 1px solid rgba(217, 119, 6, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 8px;">Gap B: The Class Imbalance Blind Spot</h3>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
             IoMT network flows are dominated by normal traffic and massive flood spams. Targeted lethal attacks (e.g., ICMP floods, host scanning, MQTT exploits) are extremely rare, causing standard AI models to achieve high accuracy by ignoring rare classes completely.
@@ -68,8 +68,8 @@
       </p>
 
       <div class="grid-2" style="margin-bottom: 20px;">
-        <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); padding: 20px; border-radius: 12px;">
-          <h3 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+        <div style="background: rgba(79, 70, 229, 0.04); border: 1px solid rgba(79, 70, 229, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-indigo); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
             📐 Observation Space (State S)
           </h3>
           <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px;">
@@ -80,7 +80,7 @@
           </p>
         </div>
 
-        <div style="background: rgba(0, 245, 160, 0.04); border: 1px solid rgba(0, 245, 160, 0.2); padding: 20px; border-radius: 12px;">
+        <div style="background: rgba(5, 150, 105, 0.04); border: 1px solid rgba(5, 150, 105, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
             🎮 Action Space (Action A)
           </h3>
@@ -94,7 +94,7 @@
       </div>
 
       <div class="grid-2">
-        <div style="background: rgba(127, 0, 255, 0.04); border: 1px solid rgba(127, 0, 255, 0.2); padding: 20px; border-radius: 12px;">
+        <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid rgba(124, 58, 237, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
             🔄 State Transitions & Discount (&gamma;=0.0)
           </h3>
@@ -103,7 +103,7 @@
           </p>
         </div>
 
-        <div style="background: rgba(255, 183, 3, 0.04); border: 1px solid rgba(255, 183, 3, 0.2); padding: 20px; border-radius: 12px;">
+        <div style="background: rgba(217, 119, 6, 0.04); border: 1px solid rgba(217, 119, 6, 0.2); padding: 20px; border-radius: 12px;">
           <h3 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
             ⚖️ Balanced Focal Reward Function (R)
           </h3>
@@ -124,32 +124,32 @@
         RL Agent-Environment Interaction Loop
       </h2>
 
-      <!-- SVG Agent-Environment Loop Diagram -->
-      <div style="background: #050811; border: 1px solid var(--border-card); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 20px;">
+      <!-- SVG Agent-Environment Loop Diagram (Light Theme) -->
+      <div style="background: #ffffff; border: 1px solid var(--border-card); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 20px;">
         <svg viewBox="0 0 900 240" style="width: 100%; height: auto;">
           <!-- Environment Box -->
-          <rect x="50" y="70" width="220" height="100" rx="12" fill="rgba(0, 242, 254, 0.08)" stroke="#00f2fe" stroke-width="2"/>
-          <text x="160" y="105" fill="#00f2fe" font-size="14" font-weight="800" text-anchor="middle">IoMT Gymnasium Env</text>
-          <text x="160" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">IoMTIDSEnv (25 Features)</text>
+          <rect x="50" y="70" width="220" height="100" rx="12" fill="rgba(2, 132, 199, 0.06)" stroke="#0284c7" stroke-width="2"/>
+          <text x="160" y="105" fill="#0284c7" font-size="14" font-weight="800" text-anchor="middle">IoMT Gymnasium Env</text>
+          <text x="160" y="125" fill="#334155" font-size="11" font-weight="600" text-anchor="middle">IoMTIDSEnv (25 Features)</text>
           <text x="160" y="145" fill="#64748b" font-size="10" text-anchor="middle">Contextual Flow Sampling</text>
 
           <!-- Action Arrow (Top) -->
-          <path d="M 630 85 L 270 85" stroke="#ffb703" stroke-width="2.5" marker-end="url(#arrow)"/>
-          <text x="450" y="75" fill="#ffb703" font-size="12" font-weight="700" text-anchor="middle">Action a_t &in; {0, 1, ..., 18} (Classification)</text>
+          <path d="M 630 85 L 270 85" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrow)"/>
+          <text x="450" y="75" fill="#b45309" font-size="12" font-weight="700" text-anchor="middle">Action a_t &in; {0, 1, ..., 18} (Classification)</text>
 
           <!-- State/Reward Arrow (Bottom) -->
-          <path d="M 270 155 L 630 155" stroke="#00f5a0" stroke-width="2.5"/>
-          <text x="450" y="175" fill="#00f5a0" font-size="12" font-weight="700" text-anchor="middle">State s_t &amp; Focal Reward r_t (+w_c / -w_c)</text>
+          <path d="M 270 155 L 630 155" stroke="#059669" stroke-width="2.5"/>
+          <text x="450" y="175" fill="#047857" font-size="12" font-weight="700" text-anchor="middle">State s_t &amp; Focal Reward r_t (+w_c / -w_c)</text>
 
           <!-- D3QN Agent Box -->
-          <rect x="630" y="70" width="220" height="100" rx="12" fill="rgba(127, 0, 255, 0.08)" stroke="#7f00ff" stroke-width="2"/>
-          <text x="740" y="105" fill="#e100ff" font-size="14" font-weight="800" text-anchor="middle">D3QN Agent</text>
-          <text x="740" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">CNN-LSTM + Dueling Q-Head</text>
+          <rect x="630" y="70" width="220" height="100" rx="12" fill="rgba(124, 58, 237, 0.06)" stroke="#7c3aed" stroke-width="2"/>
+          <text x="740" y="105" fill="#7c3aed" font-size="14" font-weight="800" text-anchor="middle">D3QN Agent</text>
+          <text x="740" y="125" fill="#334155" font-size="11" font-weight="600" text-anchor="middle">CNN-LSTM + Dueling Q-Head</text>
           <text x="740" y="145" fill="#64748b" font-size="10" text-anchor="middle">&epsilon;-Greedy Warm-Start Policy</text>
 
           <!-- Replay Buffer Sub-Box -->
-          <rect x="350" y="195" width="200" height="35" rx="6" fill="rgba(30, 41, 59, 0.9)" stroke="#4facfe" stroke-width="1.5"/>
-          <text x="450" y="217" fill="#4facfe" font-size="11" font-weight="700" text-anchor="middle">Replay Buffer (10,000 Capacity)</text>
+          <rect x="350" y="195" width="200" height="35" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="450" y="217" fill="#1e293b" font-size="11" font-weight="700" text-anchor="middle">Replay Buffer (10,000 Capacity)</text>
         </svg>
       </div>
     </section>
@@ -158,22 +158,71 @@
     <section class="card">
       <h2 class="card-title">
         <span class="card-icon">🧠</span>
-        Dueling Double Deep Q-Network (D3QN) Agent Specifications
+        Neural Architecture & D3QN Agent Specifications
       </h2>
       <p style="color: var(--text-secondary); margin-bottom: 20px;">
-        To eliminate overestimation bias and decouple state risk from specific attack actions, our agent implements a Dueling Double Q-learning architecture:
+        To eliminate overestimation bias and decouple state risk from specific attack actions, our agent implements a 1D CNN + LSTM feature extractor coupled with a Dueling Double Q-learning architecture:
       </p>
 
+      <!-- SVG Neural Architecture Diagram (Light Theme) -->
+      <div style="background: #ffffff; border: 1px solid var(--border-card); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <svg viewBox="0 0 900 240" style="width: 100%; height: auto;">
+          <!-- Input Node -->
+          <rect x="20" y="80" width="130" height="80" rx="10" fill="#f8fafc" stroke="#4f46e5" stroke-width="2"/>
+          <text x="85" y="115" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle">Input Flow</text>
+          <text x="85" y="135" fill="#64748b" font-size="11" text-anchor="middle">25 Selected Features</text>
+
+          <!-- Arrow 1 -->
+          <path d="M 150 120 L 190 120" stroke="#4f46e5" stroke-width="2"/>
+
+          <!-- Conv1D -->
+          <rect x="195" y="80" width="140" height="80" rx="10" fill="rgba(79, 70, 229, 0.06)" stroke="#4f46e5" stroke-width="2"/>
+          <text x="265" y="115" fill="#4f46e5" font-size="13" font-weight="700" text-anchor="middle">1D CNN Layer</text>
+          <text x="265" y="135" fill="#64748b" font-size="11" text-anchor="middle">Spatial Header Filters</text>
+
+          <!-- Arrow 2 -->
+          <path d="M 335 120 L 375 120" stroke="#4f46e5" stroke-width="2"/>
+
+          <!-- LSTM -->
+          <rect x="380" y="80" width="140" height="80" rx="10" fill="rgba(124, 58, 237, 0.06)" stroke="#7c3aed" stroke-width="2"/>
+          <text x="450" y="115" fill="#7c3aed" font-size="13" font-weight="700" text-anchor="middle">LSTM Recurrent Cell</text>
+          <text x="450" y="135" fill="#64748b" font-size="11" text-anchor="middle">Temporal Sequence</text>
+
+          <!-- Arrow Split -->
+          <path d="M 520 120 L 560 70" stroke="#0284c7" stroke-width="2"/>
+          <path d="M 520 120 L 560 170" stroke="#0284c7" stroke-width="2"/>
+
+          <!-- Value Stream -->
+          <rect x="565" y="35" width="140" height="60" rx="8" fill="rgba(5, 150, 105, 0.06)" stroke="#059669" stroke-width="1.5"/>
+          <text x="635" y="62" fill="#059669" font-size="12" font-weight="700" text-anchor="middle">State Value V(s)</text>
+          <text x="635" y="78" fill="#64748b" font-size="10" text-anchor="middle">Scalar State Score</text>
+
+          <!-- Advantage Stream -->
+          <rect x="565" y="145" width="140" height="60" rx="8" fill="rgba(217, 119, 6, 0.06)" stroke="#d97706" stroke-width="1.5"/>
+          <text x="635" y="172" fill="#d97706" font-size="12" font-weight="700" text-anchor="middle">Advantage A(s,a)</text>
+          <text x="635" y="188" fill="#64748b" font-size="10" text-anchor="middle">Action Relative Payoff</text>
+
+          <!-- Combine Arrow -->
+          <path d="M 705 65 L 745 110" stroke="#4f46e5" stroke-width="2"/>
+          <path d="M 705 175 L 745 130" stroke="#4f46e5" stroke-width="2"/>
+
+          <!-- Final Q Output -->
+          <rect x="750" y="80" width="130" height="80" rx="10" fill="#4f46e5"/>
+          <text x="815" y="115" fill="#ffffff" font-size="13" font-weight="800" text-anchor="middle">Q(s,a) Logits</text>
+          <text x="815" y="135" fill="#e0e7ff" font-size="11" font-weight="600" text-anchor="middle">19 Attack Classes</text>
+        </svg>
+      </div>
+
       <div class="grid-2" style="margin-bottom: 20px;">
-        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
-          <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 6px;">Dueling Q-Stream Decoupling</h4>
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-indigo); font-family: var(--font-heading); margin-bottom: 6px;">Dueling Q-Stream Decoupling</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
             Splits Q-computation into scalar <strong>State Value V(s)</strong> (general flow risk) and <strong>Action Advantage A(s,a)</strong> (relative class logit):<br>
             <code>Q(s,a) = V(s) + ( A(s,a) - (1/19) &sum; A(s,a') )</code>
           </p>
         </div>
 
-        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-purple); font-family: var(--font-heading); margin-bottom: 6px;">Double Q-Learning Target (DDQN)</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
             Uses Policy Net &theta; for action selection and Target Net &theta;<sup>-</sup> for Q-evaluation, removing positive maximization bias:<br>
@@ -183,14 +232,14 @@
       </div>
 
       <div class="grid-2">
-        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); margin-bottom: 6px;">Warm-Start &epsilon;-Greedy Exploration</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
             Starts exploration at <code>&epsilon; = 0.15</code> (after 15 pretraining epochs) decaying at rate <code>0.98</code> down to <code>&epsilon;_min = 0.01</code>. Preserves pretrained feature representations while refining boundaries.
           </p>
         </div>
 
-        <div style="background: rgba(18, 26, 43, 0.8); border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px;">
           <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 6px;">Experience Replay & SGD Frequency</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
             Maintains a FIFO transition buffer of capacity 10,000. Executes SGD updates every 4 steps (<code>step % 4 == 0</code>) using Huber Loss (<code>SmoothL1Loss</code>) and AdamW optimizer (LR = 10<sup>-3</sup>).

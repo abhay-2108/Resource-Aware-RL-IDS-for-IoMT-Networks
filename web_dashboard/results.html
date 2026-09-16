@@ -33,7 +33,7 @@
     <!-- Top Key Metric Cards -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-value" style="color: var(--accent-cyan);">85.84%</div>
+        <div class="stat-value" style="color: var(--accent-indigo);">85.84%</div>
         <div class="stat-label">Overall Test Accuracy</div>
         <div class="stat-sub">↑ +0.46% over baseline</div>
       </div>
@@ -59,7 +59,7 @@
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-amber);">6.08 ms</div>
         <div class="stat-label">CPU Per-Packet Latency</div>
-        <div class="stat-sub">Passed (<50ms clinical limit)</div>
+        <div class="stat-sub">Passed (&lt;50ms clinical limit)</div>
       </div>
     </div>
 
@@ -354,30 +354,30 @@
       </h2>
 
       <div style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); padding: 18px; border-radius: 12px;">
-          <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
-            Q1: Why does $\gamma = 0.0$ work better than $\gamma = 0.99$ for network packet classification?
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px; border-left: 4px solid var(--accent-indigo);">
+          <h4 style="color: var(--accent-indigo); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
+            Q1: Why does &gamma; = 0.0 work better than &gamma; = 0.99 for network packet classification?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Packet classification is a 1-step contextual decision rather than a multi-step sequential state trajectory. Setting $\gamma = 0.99$ causes Q-values to accumulate unbounded future rewards over infinite horizon ($Q > 500$), exploding output logits. Setting $\gamma = 0.0$ bounds Q-values strictly to $[-1, +1]$ logit space, stabilizing exploration.
+            <strong>Inference</strong>: Packet classification is a 1-step contextual decision rather than a multi-step sequential state trajectory. Setting &gamma; = 0.99 causes Q-values to accumulate unbounded future rewards over infinite horizon (Q &gt; 500), exploding output logits. Setting &gamma; = 0.0 bounds Q-values strictly to [-1, +1] logit space, stabilizing exploration.
           </p>
         </div>
 
-        <div style="background: rgba(0, 245, 160, 0.04); border: 1px solid rgba(0, 245, 160, 0.2); padding: 18px; border-radius: 12px;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px; border-left: 4px solid var(--accent-emerald);">
           <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
             Q2: Why did Selective Linear Quantization outperform Full Dynamic Quantization?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Recurrent LSTM cells propagate hidden states ($h_t, c_t$) across sequence steps. Full dynamic INT8 quantization on LSTM weights accumulates rounding noise across time steps, dropping classification accuracy down to 62%. Quantizing strictly <code>nn.Linear</code> layers keeps LSTM parameters in FP32, achieving 0.44 MB model size with <strong>zero accuracy loss (85.84%)</strong>.
+            <strong>Inference</strong>: Recurrent LSTM cells propagate hidden states (h_t, c_t) across sequence steps. Full dynamic INT8 quantization on LSTM weights accumulates rounding noise across time steps, dropping classification accuracy down to 62%. Quantizing strictly <code>nn.Linear</code> layers keeps LSTM parameters in FP32, achieving 0.44 MB model size with <strong>zero accuracy loss (85.84%)</strong>.
           </p>
         </div>
 
-        <div style="background: rgba(127, 0, 255, 0.04); border: 1px solid rgba(127, 0, 255, 0.2); padding: 18px; border-radius: 12px;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 18px; border-radius: 12px; border-left: 4px solid var(--accent-purple);">
           <h4 style="color: var(--accent-purple); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
             Q3: How does Supervised Warm-Start Pretraining assist Reinforcement Learning?
           </h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary);">
-            <strong>Inference</strong>: Standard DRL starting with random weights ($\epsilon = 1.0$) fills the replay buffer with 100% random predictions, corrupting feature representations. Pretraining the feature extractor for 15 epochs provides a 76.08% warm start, allowing DRL exploration at $\epsilon = 0.15$ to refine decision boundaries upward to 85.84%.
+            <strong>Inference</strong>: Standard DRL starting with random weights (&epsilon; = 1.0) fills the replay buffer with 100% random predictions, corrupting feature representations. Pretraining the feature extractor for 15 epochs provides a 76.08% warm start, allowing DRL exploration at &epsilon; = 0.15 to refine decision boundaries upward to 85.84%.
           </p>
         </div>
       </div>
