@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RA-RL-IDS — Page 2: Results, Figures & Inferences</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">RL</div>
+      <div class="nav-title">RA-RL-IDS for IoMT</div>
+    </div>
+    <div class="nav-links">
+      <a href="methodology.html" class="nav-btn">Page 1: Methodology & Design</a>
+      <a href="results.html" class="nav-btn active">Page 2: Results & Inferences</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-badge">📊 Page 2: Benchmark Results, Figures & Analytical Inferences</div>
+      <h1 class="hero-title">Experimental Results & Edge Performance Profile</h1>
+      <p class="hero-subtitle">
+        Empirical metrics, publication figures, per-class attack recall breakdowns, and edge CPU execution benchmarks evaluated on 130,000 real network samples from the CICIoMT2024 dataset.
+      </p>
+    </header>
+
+    <!-- Top Key Metric Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent-cyan);">85.84%</div>
+        <div class="stat-label">Overall Test Accuracy</div>
+        <div class="stat-sub">↑ +0.46% over baseline</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent-emerald);">77.36%</div>
+        <div class="stat-label">Macro F1-Score</div>
+        <div class="stat-sub">↑ +1.59% over baseline</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent-blue);">85.47%</div>
+        <div class="stat-label">Weighted F1-Score</div>
+        <div class="stat-sub">↑ +1.79% over baseline</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent-purple);">0.44 MB</div>
+        <div class="stat-label">Quantized Disk Size</div>
+        <div class="stat-sub">24.6% binary compression</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--accent-amber);">6.08 ms</div>
+        <div class="stat-label">CPU Per-Packet Latency</div>
+        <div class="stat-sub">Passed (<50ms clinical limit)</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Executive Results Comparison Table -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">📈</span>
+        Performance Comparison Across Model Variants
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Evaluated on the test split of 130,000 network flows across 19 attack categories:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Evaluation Metric</th>
+              <th>Our Baseline D3QN (Flat Reward)</th>
+              <th>Our Reward-Shaped D3QN (Weighted)</th>
+              <th>Selective Quantized D3QN (INT8 Edge)</th>
+              <th>Δ Improvement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Overall Accuracy</strong></td>
+              <td>85.38%</td>
+              <td>85.78%</td>
+              <td><span class="badge badge-success">85.84%</span></td>
+              <td><span style="color: var(--accent-emerald); font-weight: 700;">+0.46%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Macro Precision</strong></td>
+              <td>79.74%</td>
+              <td>78.19%</td>
+              <td><span class="badge badge-info">78.20%</span></td>
+              <td>Balanced boundary</td>
+            </tr>
+            <tr>
+              <td><strong>Macro Recall</strong></td>
+              <td>76.03%</td>
+              <td>77.07%</td>
+              <td><span class="badge badge-success">77.19%</span></td>
+              <td><span style="color: var(--accent-emerald); font-weight: 700;">+1.16%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Macro F1-Score</strong></td>
+              <td>75.77%</td>
+              <td>77.18%</td>
+              <td><span class="badge badge-success">77.36%</span></td>
+              <td><span style="color: var(--accent-emerald); font-weight: 700;">+1.59%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Weighted F1-Score</strong></td>
+              <td>83.68%</td>
+              <td>85.32%</td>
+              <td><span class="badge badge-success">85.47%</span></td>
+              <td><span style="color: var(--accent-emerald); font-weight: 700;">+1.79%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 2: Publication Figure Gallery -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🖼️</span>
+        Publication Figures & Experimental Visualization Gallery
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        Click any figure card to open high-resolution lightbox preview:
+      </p>
+
+      <div class="gallery-grid">
+        <!-- Figure 1 -->
+        <div class="figure-card" onclick="openModal('assets/training_curve.png')">
+          <div class="figure-img-wrapper">
+            <img src="assets/training_curve.png" alt="Training Progress Curve" class="figure-img">
+          </div>
+          <div class="figure-caption">
+            <div class="figure-title">Training Progress Curve</div>
+            <div class="figure-desc">D3QN pretraining and episode loss & validation accuracy trajectory across 300 training episodes.</div>
+          </div>
+        </div>
+
+        <!-- Figure 2 -->
+        <div class="figure-card" onclick="openModal('assets/per_class_recall_comparison.png')">
+          <div class="figure-img-wrapper">
+            <img src="assets/per_class_recall_comparison.png" alt="Per-Class Recall Comparison" class="figure-img">
+          </div>
+          <div class="figure-caption">
+            <div class="figure-title">Per-Class Recall Comparison</div>
+            <div class="figure-desc">Baseline vs. Reward-Shaped detection recall improvements across all 19 attack classes.</div>
+          </div>
+        </div>
+
+        <!-- Figure 3 -->
+        <div class="figure-card" onclick="openModal('assets/confusion_matrix_baseline.png')">
+          <div class="figure-img-wrapper">
+            <img src="assets/confusion_matrix_baseline.png" alt="Baseline Confusion Matrix" class="figure-img">
+          </div>
+          <div class="figure-caption">
+            <div class="figure-title">Baseline Confusion Matrix</div>
+            <div class="figure-desc">Test set confusion matrix for unshaped Flat Reward D3QN model.</div>
+          </div>
+        </div>
+
+        <!-- Figure 4 -->
+        <div class="figure-card" onclick="openModal('assets/confusion_matrix_final.png')">
+          <div class="figure-img-wrapper">
+            <img src="assets/confusion_matrix_final.png" alt="Final Confusion Matrix" class="figure-img">
+          </div>
+          <div class="figure-caption">
+            <div class="figure-title">Final Reward-Shaped Confusion Matrix</div>
+            <div class="figure-desc">Test set confusion matrix for final Reward-Shaped D3QN model.</div>
+          </div>
+        </div>
+
+        <!-- Figure 5 -->
+        <div class="figure-card" onclick="openModal('assets/compression_comparison.png')">
+          <div class="figure-img-wrapper">
+            <img src="assets/compression_comparison.png" alt="Edge Compression Profile" class="figure-img">
+          </div>
+          <div class="figure-caption">
+            <div class="figure-title">Edge Compression & CPU Profile</div>
+            <div class="figure-desc">Resource trade-offs: Model size (MB), CPU latency (ms), and accuracy before vs after INT8 quantization.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Per-Class Recall Breakdown Table -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🎯</span>
+        Per-Class Attack Detection Recall Breakdown
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Comparing detection rates across all 19 attack categories on the 130,000 sample test set:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Attack Class Category</th>
+              <th>Baseline Recall (Flat)</th>
+              <th>Reward-Shaped Recall</th>
+              <th>Δ Recall Gain</th>
+              <th>Impact / Observation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>DoS-ICMP_Flood</strong></td>
+              <td>22.73%</td>
+              <td><span class="badge badge-success">40.91%</span></td>
+              <td><strong style="color: var(--accent-emerald);">+18.18%</strong></td>
+              <td>Substantially higher ICMP flood detection</td>
+            </tr>
+            <tr>
+              <td><strong>DoS-UDP_Flood</strong></td>
+              <td>12.76%</td>
+              <td><span class="badge badge-success">36.38%</span></td>
+              <td><strong style="color: var(--accent-emerald);">+23.62%</strong></td>
+              <td>Over 2.8x higher recall on UDP DoS</td>
+            </tr>
+            <tr>
+              <td><strong>MQTT-DoS-Publish_Flood</strong></td>
+              <td>82.79%</td>
+              <td><span class="badge badge-info">86.89%</span></td>
+              <td><strong style="color: var(--accent-emerald);">+4.10%</strong></td>
+              <td>Higher IoT telemetry publish flood intercept</td>
+            </tr>
+            <tr>
+              <td><strong>Recon-PortScan</strong></td>
+              <td>59.81%</td>
+              <td><span class="badge badge-info">64.38%</span></td>
+              <td><strong style="color: var(--accent-emerald);">+4.57%</strong></td>
+              <td>Improved port scanning detection</td>
+            </tr>
+            <tr>
+              <td><strong>DDoS-TCP_Flood</strong></td>
+              <td>100.00%</td>
+              <td><span class="badge badge-success">100.00%</span></td>
+              <td>0.00%</td>
+              <td>100% Perfect Recall</td>
+            </tr>
+            <tr>
+              <td><strong>DoS-SYN_Flood</strong></td>
+              <td>100.00%</td>
+              <td><span class="badge badge-success">100.00%</span></td>
+              <td>0.00%</td>
+              <td>100% Perfect Recall</td>
+            </tr>
+            <tr>
+              <td><strong>MQTT-DDoS-Publish_Flood</strong></td>
+              <td>98.86%</td>
+              <td><span class="badge badge-success">99.05%</span></td>
+              <td>+0.19%</td>
+              <td>99.05% High Recall</td>
+            </tr>
+            <tr>
+              <td><strong>Recon-VulScan</strong></td>
+              <td>98.67%</td>
+              <td><span class="badge badge-success">98.67%</span></td>
+              <td>0.00%</td>
+              <td>98.67% High Recall</td>
+            </tr>
+            <tr>
+              <td><strong>DDoS-SYN_Flood</strong></td>
+              <td>97.52%</td>
+              <td><span class="badge badge-success">97.71%</span></td>
+              <td>+0.19%</td>
+              <td>97.71% High Recall</td>
+            </tr>
+            <tr>
+              <td><strong>Benign (Normal Traffic)</strong></td>
+              <td>96.57%</td>
+              <td><span class="badge badge-info">94.10%</span></td>
+              <td>-2.47%</td>
+              <td>Maintained high 94%+ baseline</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Edge CPU Benchmarking -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">⚡</span>
+        Edge Hardware CPU Benchmark (Quantization Profile)
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Profiled strictly on a single CPU core to simulate low-resource embedded gateways:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Profile Metric</th>
+              <th>Uncompressed D3QN (FP32)</th>
+              <th>Selective Quantized D3QN (INT8)</th>
+              <th>Impact / Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Model Disk Size</strong></td>
+              <td>0.59 MB (587 KB)</td>
+              <td><span class="badge badge-success">0.44 MB (442 KB)</span></td>
+              <td><strong style="color: var(--accent-emerald);">-24.6% Compression</strong></td>
+            </tr>
+            <tr>
+              <td><strong>CPU Per-Packet Latency</strong></td>
+              <td>3.99 ms</td>
+              <td><span class="badge badge-info">6.08 ms</span></td>
+              <td><strong style="color: var(--accent-emerald);">PASSED (&lt;50ms clinical budget)</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Peak RAM Memory</strong></td>
+              <td>~0.01 MB</td>
+              <td><span class="badge badge-success">~0.005 MB</span></td>
+              <td>Minimal memory footprint</td>
+            </tr>
+            <tr>
+              <td><strong>Test Classification Accuracy</strong></td>
+              <td>85.78%</td>
+              <td><span class="badge badge-success">85.84%</span></td>
+              <td><strong style="color: var(--accent-emerald);">Zero Loss (+0.06% micro-gain)</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Macro F1-Score</strong></td>
+              <td>77.18%</td>
+              <td><span class="badge badge-success">77.36%</span></td>
+              <td><strong style="color: var(--accent-emerald);">Zero Loss (+0.18% micro-gain)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 5: Analytical Inference & Defense Cheat Sheet -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">💡</span>
+        Analytical Inferences & Academic Viva Defense
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.2); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
+            Q1: Why does $\gamma = 0.0$ work better than $\gamma = 0.99$ for network packet classification?
+          </h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Inference</strong>: Packet classification is a 1-step contextual decision rather than a multi-step sequential state trajectory. Setting $\gamma = 0.99$ causes Q-values to accumulate unbounded future rewards over infinite horizon ($Q > 500$), exploding output logits. Setting $\gamma = 0.0$ bounds Q-values strictly to $[-1, +1]$ logit space, stabilizing exploration.
+          </p>
+        </div>
+
+        <div style="background: rgba(0, 245, 160, 0.04); border: 1px solid rgba(0, 245, 160, 0.2); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-emerald); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
+            Q2: Why did Selective Linear Quantization outperform Full Dynamic Quantization?
+          </h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Inference</strong>: Recurrent LSTM cells propagate hidden states ($h_t, c_t$) across sequence steps. Full dynamic INT8 quantization on LSTM weights accumulates rounding noise across time steps, dropping classification accuracy down to 62%. Quantizing strictly <code>nn.Linear</code> layers keeps LSTM parameters in FP32, achieving 0.44 MB model size with <strong>zero accuracy loss (85.84%)</strong>.
+          </p>
+        </div>
+
+        <div style="background: rgba(127, 0, 255, 0.04); border: 1px solid rgba(127, 0, 255, 0.2); padding: 18px; border-radius: 12px;">
+          <h4 style="color: var(--accent-purple); font-family: var(--font-heading); font-size: 1.05rem; margin-bottom: 6px;">
+            Q3: How does Supervised Warm-Start Pretraining assist Reinforcement Learning?
+          </h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            <strong>Inference</strong>: Standard DRL starting with random weights ($\epsilon = 1.0$) fills the replay buffer with 100% random predictions, corrupting feature representations. Pretraining the feature extractor for 15 epochs provides a 76.08% warm start, allowing DRL exploration at $\epsilon = 0.15$ to refine decision boundaries upward to 85.84%.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>RA-RL-IDS Framework — Page 2: Results, Figures & Inferences | B.Tech Final Year Project</p>
+    </footer>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="modal" onclick="closeModal()">
+    <button class="modal-close">&times;</button>
+    <img id="modalImg" class="modal-content" src="" alt="Zoomed Figure">
+  </div>
+
+  <script>
+    function openModal(imgSrc) {
+      document.getElementById('modalImg').src = imgSrc;
+      document.getElementById('lightbox').classList.add('active');
+    }
+    function closeModal() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
