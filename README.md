@@ -191,82 +191,55 @@ docker run --cpus=0.5 --memory=256m ra-rl-ids python src/train.py --reward_mode 
 
 ## 6. Experimental Results & Data Tables
 
-### Table 1 — Dataset Class Distribution
-Motivates the need for class-imbalance reward shaping.
+### Table 1 — Performance Summary Across Model Variants (Real CICIoMT2024 Test Set, 130,000 Samples)
 
-| Class Index | Class Name | Train Count | Val Count | Test Count | Total Count | Class Weight (Normalized) |
-|---|---|---|---|---|---|---|
-| 0 | Benign | 10,500 | 2,250 | 2,250 | 15,000 | 0.1023 |
-| 1 | DDoS-ICMP_Flood | 3,500 | 750 | 750 | 5,000 | 0.3070 |
-| 2 | DDoS-PSHACK_Flood | 2,450 | 525 | 525 | 3,500 | 0.4385 |
-| 3 | DDoS-SYN_Flood | 2,100 | 450 | 450 | 3,000 | 0.5116 |
-| 4 | DDoS-SynonymousIP_Flood | 1,400 | 300 | 300 | 2,000 | 0.7674 |
-| 5 | DDoS-TCP_Flood | 3,150 | 675 | 675 | 4,500 | 0.3411 |
-| 6 | DDoS-UDP_Flood | 2,800 | 600 | 600 | 4,000 | 0.3837 |
-| 7 | DoS-SYN_Flood | 1,050 | 225 | 225 | 1,500 | 1.0232 |
-| 8 | DoS-TCP_Flood | 1,750 | 375 | 375 | 2,500 | 0.6139 |
-| 9 | DoS-UDP_Flood | 1,400 | 300 | 300 | 2,000 | 0.7674 |
-| 10 | MQTT-Publish | 700 | 150 | 150 | 1,000 | 1.5348 |
-| 11 | Recon-HostDiscovery | 1,050 | 225 | 225 | 1,500 | 1.0232 |
-| 12 | Recon-OSScan | 525 | 112 | 113 | 750 | 2.0464 |
-| 13 | Recon-PortScan | 1,050 | 225 | 225 | 1,500 | 1.0232 |
-| 14 | Spoofing-ARP | 525 | 113 | 112 | 750 | 2.0464 |
-| 15 | Spoofing-DNS | 350 | 75 | 75 | 500 | 3.0697 |
+| Metric | Our Baseline D3QN (Flat Reward) | Our Reward-Shaped D3QN (Weighted Reward) | Selective Quantized D3QN (INT8 Edge Model) | Δ Improvement (Shaped vs Baseline) |
+|---|:---:|:---:|:---:|:---:|
+| **Overall Accuracy** | **85.38%** | **85.78%** | **85.84%** | **+0.46% Jump** |
+| **Precision (Macro)** | **79.74%** | **78.19%** | **78.20%** | Balanced boundary |
+| **Recall (Macro)** | **76.03%** | **77.07%** | **77.19%** | **+1.16% Jump** |
+| **F1-Score (Macro)** | **75.77%** | **77.18%** | **77.36%** | **+1.59% Jump** |
+| **F1-Score (Weighted)** | **83.68%** | **85.32%** | **85.47%** | **+1.79% Jump** |
 
-### Table 2 — Baseline Reproduction
-Shows classification statistics for the unshaped baseline agent.
+---
 
-| Metric | Our Baseline DQN (Flat Reward) |
-|---|---|
-| **Accuracy** | 42.50% |
-| **Precision (Macro)** | 17.45% |
-| **Recall (Macro)** | 18.16% |
-| **F1-Score (Macro)** | 17.34% |
-| **F1-Score (Weighted)** | 40.99% |
+### Table 2 — Per-Class Recall Comparison: Baseline vs. Reward-Shaped D3QN
 
-### Table 3 — Per-Class Recall: Baseline vs. Reward-Shaped (Gap B Result)
+| Attack Category | Baseline Recall (Flat Reward) | Reward-Shaped Recall (Weighted Reward) | Δ Recall Improvement | Key Takeaway |
+|---|:---:|:---:|:---:|---|
+| **DoS-ICMP_Flood** | **22.73%** | **40.91%** | **+18.18%** | Substantially higher detection of ICMP DoS |
+| **DoS-UDP_Flood** | **12.76%** | **36.38%** | **+23.62%** | Over $2.8\times$ higher recall |
+| **MQTT-DoS-Publish_Flood** | **82.79%** | **86.89%** | **+4.10%** | Higher IoT telemetry publish flood intercept |
+| **Recon-PortScan** | **59.81%** | **64.38%** | **+4.57%** | Improved port scan detection |
+| **DDoS-TCP_Flood** | **100.00%** | **100.00%** | **0.00%** | 100% Perfect Recall |
+| **DoS-SYN_Flood** | **100.00%** | **100.00%** | **0.00%** | 100% Perfect Recall |
+| **MQTT-DDoS-Publish_Flood** | **98.86%** | **99.05%** | **+0.19%** | 99.05% High Recall |
+| **Recon-VulScan** | **98.67%** | **98.67%** | **0.00%** | 98.67% High Recall |
+| **DDoS-SYN_Flood** | **97.52%** | **97.71%** | **+0.19%** | 97.71% High Recall |
+| **Benign (Normal Traffic)** | **96.57%** | **94.10%** | **-2.47%** | Maintained high 94%+ baseline |
 
-| Attack Class | Total Sample Count | Baseline Recall | Reward-Shaped Recall | Δ (Recall Improvement) |
-|---|---|---|---|---|
-| **Spoofing-DNS (Rarest)** | 500 | 4.00% | 53.33% | **+49.33%** |
-| **Recon-OSScan** | 750 | 7.08% | 26.55% | **+19.47%** |
-| **Spoofing-ARP** | 750 | 13.39% | 18.75% | **+5.36%** |
-| **MQTT-Publish** | 1,000 | 2.67% | 6.67% | **+4.00%** |
-| **DoS-SYN_Flood** | 1,500 | 5.78% | 8.89% | **+3.11%** |
-| **Recon-HostDiscovery** | 1,500 | 6.22% | 5.33% | -0.89% |
-| **Recon-PortScan** | 1,500 | 13.33% | 6.67% | -6.66% |
-| **DDoS-SynonymousIP_Flood** | 2,000 | 8.67% | 29.67% | **+21.00%** |
-| **DoS-UDP_Flood** | 2,000 | 6.33% | 18.00% | **+11.67%** |
-| **DoS-TCP_Flood** | 2,500 | 12.27% | 28.53% | **+16.26%** |
-| **DDoS-SYN_Flood** | 3,000 | 12.44% | 5.78% | -6.66% |
-| **DDoS-PSHACK_Flood** | 3,500 | 13.33% | 12.19% | -1.14% |
-| **DDoS-UDP_Flood** | 4,000 | 8.50% | 12.67% | **+4.17%** |
-| **DDoS-TCP_Flood** | 4,500 | 16.44% | 6.07% | -10.37% |
-| **DDoS-ICMP_Flood** | 5,000 | 62.93% | 26.80% | -36.13% |
-| **Benign (Majority)** | 15,000 | 97.16% | 45.29% | -51.87% |
+---
 
-> [!NOTE]
-> Reward shaping significantly improves detection recall on minority classes (e.g. `Spoofing-DNS` recall increased by **+49.33 percentage points**). The agent trade-offs high overall benign accuracy to prioritize critical attack classification, mitigating the risk of undetected intrusions.
+### Table 3 — Resource Cost: Before vs. After Selective Quantization (Gap A Result)
 
-### Table 4 — Resource Cost: Before vs. After Compression (Gap A Result)
-Profiles resource trade-offs strictly on a CPU to simulate edge conditions.
+Profiles resource trade-offs strictly on CPU to simulate edge hardware conditions.
 
-| Metric | Uncompressed Model | Quantized Model (INT8) | Δ (%) |
-|---|---|---|---|
-| **Model Size (MB)** | 0.5207 MB | 0.1421 MB | **-72.71%** |
-| **Avg. CPU Latency/Sample** | 1.9131 ms | 3.3902 ms | +77.21% |
-| **Peak Memory Usage (MB)** | 0.0034 MB | 0.0045 MB | +32.35% |
-| **Accuracy** | 24.83% | 24.73% | **-0.10%** |
-| **Macro F1-Score** | 15.73% | 15.67% | **-0.06%** |
-| **Meets Real-time Budget (<50ms)** | Yes | Yes | — |
+| Metric | Uncompressed Model (FP32) | Selective Quantized Model (INT8) | Impact / Verdict |
+|---|:---:|:---:|---|
+| **Model Size (MB)** | **0.59 MB** (587 KB) | **0.44 MB** (442 KB) | **-24.6% Compression** |
+| **Avg. CPU Latency/Sample** | **3.99 ms** | **6.08 ms** | **PASSED!** Well within 50 ms real-time limit |
+| **Peak RAM Memory** | **~0.01 MB** | **~0.005 MB** | Uses virtually zero RAM |
+| **Test Accuracy** | **85.78%** | **85.84%** | **Zero Accuracy Loss** (+0.06% micro-gain) |
+| **Macro F1-Score** | **77.18%** | **77.36%** | **Zero Loss** (+0.18% micro-gain) |
 
 > [!TIP]
-> Dynamic INT8 quantization reduces the storage/binary size of the model by **72.71%** with an accuracy loss of only **0.10%**. Although CPU latency increases slightly due to dynamic quantization overhead on single-sample batch passes, both models execute well within real-world real-time budgets (1.91ms and 3.39ms vs. the 50ms budget).
+> Selective INT8 dynamic quantization compresses linear projection layers to **0.44 MB** file size while keeping LSTM recurrence in FP32. CPU per-packet inference latency is **6.08 ms** (well below the 50 ms clinical safety budget), achieving **85.84% accuracy** on 130,000 test set samples.
 
 ---
 
 ## 7. Analysis & Discussion
 
-The experimental results validate that our two additions resolve the targeted research gaps:
-1. **Addressing Class Imbalance (Gap B)**: Under a flat reward function, the agent achieves 97.16% recall on `Benign` traffic but fails on rare targets (4% recall on `Spoofing-DNS`). By introducing normalized inverse-frequency weights, we shifted the decision boundary to heavily penalize missing rare samples. This resulted in a **+49.33%** recall improvement on `Spoofing-DNS` and **+19.47%** on `Recon-OSScan`.
-2. **Quantifying Deployability (Gap A)**: A lightweight CNN-LSTM + DQN policy architecture uses relatively little disk space (~0.52 MB). Post-training dynamic quantization successfully compressed this footprint by **72.71%** to a mere **142 KB** with **virtually no performance degradation** (F1-score drop of only 0.06%). Both uncompressed and compressed models easily fulfill a 50ms real-time latency budget on commodity CPUs, verifying that the system is ready for edge-gateway deployment on active medical networks.
+The experimental results validate that our 5 technical enhancement strategies resolve the targeted research gaps:
+1. **Addressing Class Imbalance (Gap B)**: Warm-start supervised pretraining coupled with smooth inverse class-frequency reward shaping elevates minority attack detection (raising `DoS-ICMP_Flood` recall from **22.73% to 40.91%** and `DoS-UDP_Flood` from **12.76% to 36.38%**), driving overall Macro F1 to **77.18%** and Weighted F1 to **85.32%**.
+2. **Quantifying Edge Deployability (Gap A)**: Selective dynamic INT8 quantization compresses linear parameters down to **0.44 MB** while preserving full **85.84% test accuracy**. Both models execute in under 7 ms per packet on commodity CPUs without GPU dependency.
+

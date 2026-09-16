@@ -38,6 +38,7 @@ def config():
     cfg["dataset"]["synthetic_total_samples"] = 2000
     cfg["dataset"]["num_features"] = 10
     # Use temp directories
+    cfg["paths"]["data_raw"] = "data/raw_test_isolated"
     cfg["paths"]["data_processed"] = "data/processed"
     cfg["paths"]["results"] = "results"
     return cfg

@@ -33,6 +33,7 @@ class Experience(NamedTuple):
     reward: float
     next_state: np.ndarray
     done: bool
+    true_label: int = 0
 
 
 # ---------------------------------------------------------------------------
@@ -55,9 +56,10 @@ class ReplayBuffer:
         reward: float,
         next_state: np.ndarray,
         done: bool,
+        true_label: int = 0,
     ) -> None:
         """Store a transition."""
-        self.buffer.append(Experience(state, action, reward, next_state, done))
+        self.buffer.append(Experience(state, action, reward, next_state, done, true_label))
 
     def sample(self, batch_size: int) -> List[Experience]:
         """Sample a random mini-batch of transitions."""
@@ -167,13 +169,15 @@ class CNNLSTMFeatureExtractor(nn.Module):
 
 
 # ---------------------------------------------------------------------------
-# DQN Network
+# DQN Network (Dueling Deep Q-Network)
 # ---------------------------------------------------------------------------
 class DQNNetwork(nn.Module):
-    """Deep Q-Network for IoMT intrusion detection.
+    """Dueling Deep Q-Network for IoMT intrusion detection.
 
-    Combines the CNN-LSTM feature extractor with a Q-value head that
-    outputs one Q-value per discrete action (class).
+    Combines the CNN-LSTM feature extractor with a Dueling Q-value head that
+    decouples state-value estimation V(s) from advantage estimation A(s, a):
+
+        Q(s, a) = V(s) + (A(s, a) - mean_{a'}(A(s, a')))
 
     Args:
         n_features: Number of input features.
@@ -209,15 +213,22 @@ class DQNNetwork(nn.Module):
             embedding_dim=dqn_hidden_size,
         )
 
-        # Q-value head
-        self.q_head = nn.Sequential(
+        # Dueling stream: State-Value V(s)
+        self.value_stream = nn.Sequential(
+            nn.Linear(dqn_hidden_size, dqn_hidden_size),
+            nn.ReLU(),
+            nn.Linear(dqn_hidden_size, 1),
+        )
+
+        # Dueling stream: Advantage A(s, a)
+        self.advantage_stream = nn.Sequential(
             nn.Linear(dqn_hidden_size, dqn_hidden_size),
             nn.ReLU(),
             nn.Linear(dqn_hidden_size, n_actions),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Compute Q-values for all actions.
+        """Compute Q-values for all actions via Dueling formula.
 
         Args:
             x: Input features ``(batch, n_features)``.
@@ -226,7 +237,9 @@ class DQNNetwork(nn.Module):
             Q-values ``(batch, n_actions)``.
         """
         embedding = self.feature_extractor(x)
-        q_values = self.q_head(embedding)
+        val = self.value_stream(embedding)
+        adv = self.advantage_stream(embedding)
+        q_values = val + (adv - adv.mean(dim=-1, keepdim=True))
         return q_values
 
 

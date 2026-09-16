@@ -30,13 +30,15 @@ dataset:
   test_ratio: 0.15
   # Label column name in CICIoMT2024 CSVs
   label_column: "label"
+  # Max samples per class to load from raw CSVs (preserves all minority samples while capping massive floods)
+  raw_max_samples_per_class: 3500
 
 # --- Environment ---
 environment:
   # "flat" or "weighted"
   reward_mode: "flat"
   # Penalty multiplier for weighted reward false negatives
-  penalty_factor: 2.0
+  penalty_factor: 1.5
 
 # --- Model Architecture ---
 model:
@@ -51,14 +53,15 @@ model:
 
 # --- Training Hyperparameters ---
 training:
-  num_episodes: 200
+  num_episodes: 300
+  pretrain_epochs: 15
   max_steps_per_episode: 1000
   batch_size: 64
   learning_rate: 0.001
-  gamma: 0.99                    # Discount factor
+  gamma: 0.0                     # Discount factor (0.0 for single-step contextual bandit classification)
   epsilon_start: 1.0             # Initial exploration rate
   epsilon_end: 0.01              # Minimum exploration rate
-  epsilon_decay: 0.995           # Multiplicative decay per episode
+  epsilon_decay: 0.98            # Multiplicative decay per episode
   replay_buffer_capacity: 10000
   target_update_frequency: 10    # Update target network every N episodes
   eval_frequency: 10             # Evaluate every N episodes

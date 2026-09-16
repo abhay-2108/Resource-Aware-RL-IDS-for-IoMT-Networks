@@ -135,11 +135,11 @@ def measure_peak_memory_mb(
 
 
 def quantize_model(model: DQNNetwork) -> nn.Module:
-    """Apply dynamic INT8 quantization to the model.
+    """Apply selective dynamic INT8 quantization to the model.
 
-    Targets ``nn.Linear`` and ``nn.LSTM`` layers, which are well-supported
-    by PyTorch dynamic quantization. Conv1d is left as-is since dynamic
-    quantization support is limited for Conv layers.
+    Targets ``nn.Linear`` layers for dynamic INT8 quantization, leaving
+    ``nn.LSTM`` in FP32 to prevent recurrent hidden state rounding noise
+    and preserve high test accuracy.
 
     Args:
         model: Trained DQN model on CPU.
@@ -152,10 +152,10 @@ def quantize_model(model: DQNNetwork) -> nn.Module:
 
     quantized = quantization.quantize_dynamic(
         model,
-        {nn.Linear, nn.LSTM},
+        {nn.Linear},
         dtype=torch.qint8,
     )
-    logger.info("Applied dynamic INT8 quantization (Linear + LSTM layers)")
+    logger.info("Applied selective dynamic INT8 quantization (Linear layers only)")
     return quantized
 
 

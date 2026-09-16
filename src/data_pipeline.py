@@ -155,12 +155,63 @@ def _generate_synthetic_dataset(
     return result
 
 
-def load_raw_data(raw_dir: str, label_column: str = "label") -> Optional[pd.DataFrame]:
+def infer_label_from_filename(filename: str) -> str:
+    """Infer the attack class label from a PCAP flow CSV filename.
+
+    Args:
+        filename: Base filename or full path of the flow CSV.
+
+    Returns:
+        Standardized string label.
+    """
+    name = Path(filename).name
+    mapping = {
+        "ARP_Spoofing": "Spoofing-ARP",
+        "Benign": "Benign",
+        "MQTT-DDoS-Connect_Flood": "MQTT-DDoS-Connect_Flood",
+        "MQTT-DDoS-Publish_Flood": "MQTT-DDoS-Publish_Flood",
+        "MQTT-DoS-Connect_Flood": "MQTT-DoS-Connect_Flood",
+        "MQTT-DoS-Publish_Flood": "MQTT-DoS-Publish_Flood",
+        "MQTT-Malformed_Data": "MQTT-Malformed_Data",
+        "Recon-OS_Scan": "Recon-OSScan",
+        "Recon-Ping_Sweep": "Recon-HostDiscovery",
+        "Recon-Port_Scan": "Recon-PortScan",
+        "Recon-VulScan": "Recon-VulScan",
+        "TCP_IP-DDoS-ICMP1": "DDoS-ICMP_Flood",
+        "TCP_IP-DDoS-SYN1": "DDoS-SYN_Flood",
+        "TCP_IP-DDoS-TCP1": "DDoS-TCP_Flood",
+        "TCP_IP-DDoS-UDP1": "DDoS-UDP_Flood",
+        "TCP_IP-DoS-ICMP1": "DoS-ICMP_Flood",
+        "TCP_IP-DoS-SYN1": "DoS-SYN_Flood",
+        "TCP_IP-DoS-TCP1": "DoS-TCP_Flood",
+        "TCP_IP-DoS-UDP1": "DoS-UDP_Flood",
+    }
+    for prefix, label in mapping.items():
+        if prefix.lower() in name.lower():
+            return label
+
+    # Fallback cleanup
+    clean = name.replace(".pcap_Flow.csv", "").replace(".csv", "").replace("_train", "")
+    return clean
+
+
+def load_raw_data(
+    raw_dir: str,
+    label_column: str = "label",
+    max_samples_per_class: Optional[int] = None,
+    seed: int = 42,
+) -> Optional[pd.DataFrame]:
     """Attempt to load and merge all CSV files from the raw data directory.
+
+    Infers class labels from filenames if the CSV contains placeholder values
+    like 'NeedManualLabel', and caps oversized flood classes to prevent memory
+    exhaustion while strictly preserving 100% of minority class samples.
 
     Args:
         raw_dir: Path to directory containing CICIoMT2024 CSV files.
         label_column: Name of the label/target column.
+        max_samples_per_class: Maximum rows per class (None for all).
+        seed: Random seed for class subsampling.
 
     Returns:
         Merged ``DataFrame`` or ``None`` if no CSVs are found.
@@ -173,31 +224,45 @@ def load_raw_data(raw_dir: str, label_column: str = "label") -> Optional[pd.Data
 
     frames: List[pd.DataFrame] = []
     for csv_file in csv_files:
-        logger.info("Loading %s ...", csv_file.name)
+        inferred_label = infer_label_from_filename(csv_file.name)
+        logger.info("Loading %s (class: %s) ...", csv_file.name, inferred_label)
         df = pd.read_csv(csv_file, low_memory=False)
+
+        # Check if the dataset already has meaningful labels
+        has_meaningful_label = False
+        for alt in (label_column, "Label", "class", "Class", "attack_type", "Attack"):
+            if alt in df.columns:
+                unique_vals = [v for v in df[alt].dropna().unique() if str(v) != "NeedManualLabel"]
+                if len(unique_vals) >= 1:
+                    if alt != label_column:
+                        df.rename(columns={alt: label_column}, inplace=True)
+                    has_meaningful_label = True
+                    break
+
+        if not has_meaningful_label:
+            # Overwrite placeholder column with the scenario's true ground-truth label
+            df[label_column] = inferred_label
+            # Drop any lingering original 'Label' column if it was renamed or separate
+            if "Label" in df.columns and label_column != "Label":
+                df.drop(columns=["Label"], inplace=True)
+
+        # Cap majority classes to prevent flood files from exhausting memory
+        if max_samples_per_class is not None and len(df) > max_samples_per_class:
+            df = df.sample(n=max_samples_per_class, random_state=seed)
+            logger.info("  -> Subsampled from original to %d rows", len(df))
+        else:
+            logger.info("  -> Kept all %d rows (minority preserved)", len(df))
+
         frames.append(df)
 
     merged = pd.concat(frames, ignore_index=True)
     logger.info(
-        "Loaded %d CSV files → %d total samples, %d columns",
+        "Loaded %d CSV files -> %d total samples across %d classes, %d columns",
         len(csv_files),
         len(merged),
+        merged[label_column].nunique(),
         len(merged.columns),
     )
-
-    # Ensure the label column exists
-    if label_column not in merged.columns:
-        # Try common alternative names
-        for alt in ("Label", "class", "Class", "attack_type", "Attack"):
-            if alt in merged.columns:
-                merged.rename(columns={alt: label_column}, inplace=True)
-                logger.info("Renamed column '%s' → '%s'", alt, label_column)
-                break
-        else:
-            raise ValueError(
-                f"Label column '{label_column}' not found. "
-                f"Available columns: {list(merged.columns)}"
-            )
     return merged
 
 
@@ -216,7 +281,7 @@ def clean_dataframe(df: pd.DataFrame, label_column: str = "label") -> pd.DataFra
     labels = df[label_column].copy()
     features = df.drop(columns=[label_column])
 
-    # Keep only numeric columns
+    # Keep only numeric columns (drops Flow ID, IP addresses, timestamps, etc.)
     features = features.select_dtypes(include=[np.number])
 
     # Replace infinities with NaN, then fill NaN with column median, fallback to 0.0
@@ -258,7 +323,16 @@ def select_features(
         Tuple of (selected feature matrix, selected feature names, MI scores).
     """
     num_features = min(num_features, X.shape[1])
-    mi_scores = mutual_info_classif(X, y, random_state=seed)
+
+    # Accelerate MI estimation if dataset is large by subsampling up to 10k samples
+    if len(X) > 10000:
+        rng = np.random.RandomState(seed)
+        subsample_idx = rng.choice(len(X), size=10000, replace=False)
+        X_mi, y_mi = X[subsample_idx], y[subsample_idx]
+    else:
+        X_mi, y_mi = X, y
+
+    mi_scores = mutual_info_classif(X_mi, y_mi, random_state=seed)
     top_indices = np.argsort(mi_scores)[::-1][:num_features]
     selected_names = [feature_names[i] for i in top_indices]
 
@@ -270,7 +344,7 @@ def select_features(
     return X[:, top_indices], selected_names, mi_scores
 
 
-def run_pipeline(config: Dict[str, Any]) -> Dict[str, Any]:
+def run_pipeline(config: Dict[str, Any], force_recompute: bool = False) -> Dict[str, Any]:
     """Execute the full data pipeline.
 
     Steps:
@@ -283,6 +357,7 @@ def run_pipeline(config: Dict[str, Any]) -> Dict[str, Any]:
 
     Args:
         config: Parsed configuration dictionary.
+        force_recompute: If True, ignores cached preprocessed files.
 
     Returns:
         Dictionary with keys: ``X_train``, ``X_val``, ``X_test``, ``y_train``,
@@ -293,11 +368,41 @@ def run_pipeline(config: Dict[str, Any]) -> Dict[str, Any]:
     paths_cfg = config["paths"]
     seed = config["seed"]
 
+    processed_dir = Path(paths_cfg["data_processed"])
+    meta_path = processed_dir / "pipeline_meta.joblib"
+    if (
+        not force_recompute
+        and (processed_dir / "X_train.npy").exists()
+        and meta_path.exists()
+    ):
+        import joblib
+        logger.info("Loading cached processed dataset from %s", processed_dir)
+        meta = joblib.load(str(meta_path))
+        return {
+            "X_train": np.load(str(processed_dir / "X_train.npy")),
+            "X_val": np.load(str(processed_dir / "X_val.npy")),
+            "X_test": np.load(str(processed_dir / "X_test.npy")),
+            "y_train": np.load(str(processed_dir / "y_train.npy")),
+            "y_val": np.load(str(processed_dir / "y_val.npy")),
+            "y_test": np.load(str(processed_dir / "y_test.npy")),
+            "class_weights": np.load(str(processed_dir / "class_weights.npy")),
+            "label_encoder": meta["label_encoder"],
+            "scaler": meta["scaler"],
+            "feature_names": meta["feature_names"],
+            "num_classes": meta["num_classes"],
+        }
+
     # ---- 1. Load or generate ----
     raw_dir = paths_cfg["data_raw"]
     label_col = ds_cfg["label_column"]
+    max_samples = ds_cfg.get("raw_max_samples_per_class", None)
 
-    df = load_raw_data(raw_dir, label_col)
+    df = load_raw_data(
+        raw_dir,
+        label_col,
+        max_samples_per_class=max_samples,
+        seed=seed,
+    )
     if df is None:
         df = _generate_synthetic_dataset(
             total_samples=ds_cfg["synthetic_total_samples"],
@@ -379,7 +484,18 @@ def run_pipeline(config: Dict[str, Any]) -> Dict[str, Any]:
     np.save(str(processed_dir / "y_test.npy"), y_test)
     np.save(str(processed_dir / "class_weights.npy"), class_weights)
 
-    logger.info("Saved processed data to %s", processed_dir)
+    import joblib
+    joblib.dump(
+        {
+            "label_encoder": le,
+            "scaler": scaler,
+            "feature_names": selected_features,
+            "num_classes": num_classes,
+        },
+        str(processed_dir / "pipeline_meta.joblib"),
+    )
+
+    logger.info("Saved processed data and metadata to %s", processed_dir)
 
     # ---- 10. Export class distribution ----
     results_dir = Path(paths_cfg["results"])

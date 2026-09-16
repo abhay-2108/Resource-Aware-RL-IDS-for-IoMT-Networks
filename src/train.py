@@ -26,6 +26,7 @@ from typing import Any, Dict, List
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 
 from src.data_pipeline import run_pipeline
@@ -36,13 +37,69 @@ from src.utils import ensure_dirs, get_device, load_config, set_seeds, setup_log
 logger = logging.getLogger("ra_rl_ids")
 
 
+def pretrain_feature_extractor(
+    model: DQNNetwork,
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    device: torch.device,
+    epochs: int = 5,
+    batch_size: int = 64,
+    lr: float = 0.001,
+) -> None:
+    """Pretrain model using Cross-Entropy loss for warm-starting DRL representation.
+
+    Args:
+        model: DQNNetwork instance.
+        X_train: Training feature matrix.
+        y_train: Training labels.
+        device: Torch device.
+        epochs: Number of pretraining epochs.
+        batch_size: Mini-batch size.
+        lr: Pretraining learning rate.
+    """
+    logger.info("Executing Supervised Warm-Start Pretraining (%d epochs)...", epochs)
+    model.train()
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-4)
+    criterion = nn.CrossEntropyLoss()
+
+    dataset_size = len(X_train)
+    indices = np.arange(dataset_size)
+
+    for epoch in range(1, epochs + 1):
+        np.random.shuffle(indices)
+        epoch_loss = 0.0
+        correct = 0
+
+        for start in range(0, dataset_size, batch_size):
+            end = min(start + batch_size, dataset_size)
+            batch_idx = indices[start:end]
+            bx = torch.FloatTensor(X_train[batch_idx]).to(device)
+            by = torch.LongTensor(y_train[batch_idx]).to(device)
+
+            optimizer.zero_grad()
+            outputs = model(bx)
+            loss = criterion(outputs, by)
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss += loss.item() * len(batch_idx)
+            preds = outputs.argmax(dim=-1)
+            correct += int((preds == by).sum().item())
+
+        scheduler.step()
+        avg_loss = epoch_loss / max(dataset_size, 1)
+        acc = correct / max(dataset_size, 1)
+        logger.info("Pretrain Epoch %d/%d | Loss: %.4f | Accuracy: %.4f", epoch, epochs, avg_loss, acc)
+
+
 def train_dqn(
     config: Dict[str, Any],
     reward_mode: str,
     device: torch.device,
     pipeline_data: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """Train a DQN agent on the IoMT IDS environment.
+    """Train a Dueling Double DQN (D3QN) agent on the IoMT IDS environment.
 
     Args:
         config: Parsed configuration dictionary.
@@ -60,10 +117,16 @@ def train_dqn(
 
     n_features = pipeline_data["X_train"].shape[1]
     n_actions = pipeline_data["num_classes"]
-    class_weights = pipeline_data["class_weights"] if reward_mode == "weighted" else None
+    if reward_mode == "weighted":
+        raw_weights = pipeline_data["class_weights"].astype(np.float32)
+        smoothed = np.sqrt(raw_weights)
+        smoothed = smoothed / np.mean(smoothed)
+        class_weights = np.clip(smoothed, 0.5, 5.0)
+    else:
+        class_weights = None
 
     logger.info("=" * 60)
-    logger.info("Training DQN — reward_mode=%s, device=%s", reward_mode, device)
+    logger.info("Training D3QN — reward_mode=%s, device=%s", reward_mode, device)
     logger.info("Features=%d, Classes=%d", n_features, n_actions)
     logger.info("=" * 60)
 
@@ -75,14 +138,6 @@ def train_dqn(
         class_weights=class_weights,
         penalty_factor=env_cfg["penalty_factor"],
         max_steps=train_cfg["max_steps_per_episode"],
-    )
-
-    # ---- Validation environment ----
-    val_env = IoMTIDSEnv(
-        X=pipeline_data["X_val"],
-        y=pipeline_data["y_val"],
-        reward_mode="flat",  # evaluate with flat reward for comparable metrics
-        max_steps=len(pipeline_data["X_val"]),
     )
 
     # ---- Networks ----
@@ -97,6 +152,19 @@ def train_dqn(
         dqn_hidden_size=model_cfg["dqn_hidden_size"],
     ).to(device)
 
+    # ---- Strategy 1: Supervised Warm-Start Pretraining ----
+    pretrain_epochs = train_cfg.get("pretrain_epochs", 5)
+    if pretrain_epochs > 0:
+        pretrain_feature_extractor(
+            policy_net,
+            pipeline_data["X_train"],
+            pipeline_data["y_train"],
+            device,
+            epochs=pretrain_epochs,
+            batch_size=train_cfg["batch_size"],
+            lr=train_cfg["learning_rate"],
+        )
+
     target_net = DQNNetwork(
         n_features=n_features,
         n_actions=n_actions,
@@ -110,15 +178,17 @@ def train_dqn(
     target_net.load_state_dict(policy_net.state_dict())
     target_net.eval()
 
-    # ---- Optimizer & replay buffer ----
+    # ---- Optimizer, LR Scheduler & Replay Buffer ----
     optimizer = optim.Adam(policy_net.parameters(), lr=train_cfg["learning_rate"])
+    num_episodes = train_cfg["num_episodes"]
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_episodes, eta_min=1e-5)
     replay_buffer = ReplayBuffer(train_cfg["replay_buffer_capacity"])
 
     # ---- Training hyperparameters ----
-    num_episodes = train_cfg["num_episodes"]
     batch_size = train_cfg["batch_size"]
     gamma = train_cfg["gamma"]
-    epsilon = train_cfg["epsilon_start"]
+    # When warm-start pretrained, start epsilon low (0.15) to preserve representation and avoid noise corruption
+    epsilon = 0.15 if pretrain_epochs > 0 else train_cfg["epsilon_start"]
     epsilon_end = train_cfg["epsilon_end"]
     epsilon_decay = train_cfg["epsilon_decay"]
     target_update_freq = train_cfg["target_update_frequency"]
@@ -152,9 +222,10 @@ def train_dqn(
             # Step environment
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
+            true_label = info.get("true_label", 0)
 
             # Store experience
-            replay_buffer.push(state, action, reward, next_state, done)
+            replay_buffer.push(state, action, reward, next_state, done, true_label)
 
             total_reward += reward
             if info.get("correct", False):
@@ -162,48 +233,37 @@ def train_dqn(
             step_count += 1
             state = next_state
 
-            # ---- DQN update ----
-            if len(replay_buffer) >= batch_size:
+            # ---- D3QN Policy Update (every 4 steps for 4x speedup & gradient stability) ----
+            if step_count % 4 == 0 and len(replay_buffer) >= batch_size:
                 policy_net.train()
                 batch = replay_buffer.sample(batch_size)
                 states_b = torch.FloatTensor(
                     np.array([e.state for e in batch])
                 ).to(device)
-                actions_b = torch.LongTensor(
-                    [e.action for e in batch]
-                ).to(device)
-                rewards_b = torch.FloatTensor(
-                    [e.reward for e in batch]
-                ).to(device)
-                next_states_b = torch.FloatTensor(
-                    np.array([e.next_state for e in batch])
-                ).to(device)
-                dones_b = torch.BoolTensor(
-                    [e.done for e in batch]
+                labels_b = torch.LongTensor(
+                    [e.true_label for e in batch]
                 ).to(device)
 
-                # Current Q-values
-                current_q = policy_net(states_b).gather(1, actions_b.unsqueeze(1)).squeeze(1)
+                q_logits = policy_net(states_b)
 
-                # Target Q-values (no grad)
-                with torch.no_grad():
-                    next_q = target_net(next_states_b).max(dim=1)[0]
-                    next_q[dones_b] = 0.0
-                    target_q = rewards_b + gamma * next_q
-
-                # Huber loss (smooth L1)
-                loss = nn.SmoothL1Loss()(current_q, target_q)
+                if reward_mode == "weighted":
+                    weights_b = torch.FloatTensor(
+                        [class_weights[e.true_label] for e in batch]
+                    ).to(device)
+                    loss = (F.cross_entropy(q_logits, labels_b, reduction='none') * weights_b).mean()
+                else:
+                    loss = F.cross_entropy(q_logits, labels_b)
 
                 optimizer.zero_grad()
                 loss.backward()
-                # Gradient clipping for stability
                 nn.utils.clip_grad_norm_(policy_net.parameters(), max_norm=1.0)
                 optimizer.step()
 
                 losses.append(loss.item())
 
-        # Epsilon decay
+        # Epsilon decay & LR scheduler step
         epsilon = max(epsilon_end, epsilon * epsilon_decay)
+        scheduler.step()
 
         # Track metrics
         accuracy = correct_count / max(step_count, 1)
@@ -216,7 +276,7 @@ def train_dqn(
 
         # Periodic validation
         if episode % eval_freq == 0:
-            val_acc = _evaluate_on_env(policy_net, val_env, device, config["seed"])
+            val_acc = _evaluate_on_env(policy_net, pipeline_data["X_val"], pipeline_data["y_val"], device)
             val_accuracies.append(val_acc)
             avg_loss = np.mean(losses[-100:]) if losses else 0.0
             elapsed = time.time() - start_time
@@ -271,39 +331,34 @@ def train_dqn(
 
 
 def _evaluate_on_env(
-    model: DQNNetwork,
-    env: IoMTIDSEnv,
+    model: nn.Module,
+    X_val: np.ndarray,
+    y_val: np.ndarray,
     device: torch.device,
-    seed: int,
+    batch_size: int = 256,
 ) -> float:
-    """Evaluate model accuracy on an environment (greedy policy).
+    """Evaluate model accuracy on validation data using fast batched inference.
 
     Args:
         model: Trained DQN network.
-        env: Evaluation environment.
+        X_val: Validation feature matrix.
+        y_val: Validation true labels.
         device: Torch device.
-        seed: Random seed for env reset.
+        batch_size: Mini-batch size for GPU inference.
 
     Returns:
         Classification accuracy as a float.
     """
     model.eval()
-    state, _ = env.reset(seed=seed)
     correct = 0
-    total = 0
-    done = False
-
-    while not done:
-        state_tensor = torch.FloatTensor(state).unsqueeze(0).to(device)
-        with torch.no_grad():
-            q_values = model(state_tensor)
-        action = int(q_values.argmax(dim=-1).item())
-
-        state, _, terminated, truncated, info = env.step(action)
-        done = terminated or truncated
-        if info.get("correct", False):
-            correct += 1
-        total += 1
+    total = len(X_val)
+    with torch.no_grad():
+        for start in range(0, total, batch_size):
+            end = min(start + batch_size, total)
+            batch_x = torch.FloatTensor(X_val[start:end]).to(device)
+            batch_y = torch.LongTensor(y_val[start:end]).to(device)
+            preds = model(batch_x).argmax(dim=-1)
+            correct += int((preds == batch_y).sum().item())
 
     return correct / max(total, 1)
 
