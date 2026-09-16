@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RA-RL-IDS — Resource-Aware RL IDS for IoMT Networks</title>
+  <title>RA-RL-IDS — Home | Resource-Aware RL IDS for IoMT</title>
   <link rel="stylesheet" href="style.css">
 
   <!-- MathJax for LaTeX Equation Rendering -->
@@ -31,84 +31,240 @@
       <div class="nav-title">RA-RL-IDS for IoMT</div>
     </div>
     <div class="nav-links">
-      <a href="methodology.html" class="nav-btn">Page 1: Methodology & Design</a>
-      <a href="results.html" class="nav-btn">Page 2: Results & Inferences</a>
+      <a href="index.html" class="nav-btn active">Home</a>
+      <a href="methodology.html" class="nav-btn">Methodology & Design</a>
+      <a href="results.html" class="nav-btn">Results & Benchmarks</a>
     </div>
   </nav>
 
   <div class="container">
-    <!-- Main Hero -->
-    <header class="hero" style="padding: 40px 0;">
-      <div class="hero-badge">🎓 B.Tech Final Year Project Dashboard</div>
-      <h1 class="hero-title" style="font-size: 3.2rem;">Resource-Aware Reinforcement Learning IDS for IoMT Networks</h1>
-      <p class="hero-subtitle" style="font-size: 1.2rem; max-width: 850px;">
-        An optimized Dueling Double Deep Q-Network (D3QN) framework resolving class imbalance and edge deployability constraints on clinical medical device networks.
+    <!-- Main Hero Header -->
+    <header class="hero" style="padding: 30px 0 20px;">
+      <div class="hero-badge">🎓 B.Tech Final Year Cyber Security & AI Project</div>
+      <h1 class="hero-title" style="font-size: 3.1rem;">Resource-Aware Reinforcement Learning IDS for IoMT Networks</h1>
+      <p class="hero-subtitle" style="font-size: 1.15rem; max-width: 860px;">
+        An optimized Dueling Double Deep Q-Network (D3QN) intrusion detection framework engineered specifically for resource-constrained Internet of Medical Things (IoMT) clinical environments.
       </p>
 
-      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px;">
-        <a href="methodology.html" class="nav-btn active" style="padding: 14px 32px; font-size: 1rem;">
-          Explore Page 1: Methodology & Architecture →
+      <div style="display: flex; gap: 16px; justify-content: center; margin-top: 28px;">
+        <a href="methodology.html" class="nav-btn active" style="padding: 13px 28px; font-size: 0.95rem;">
+          Explore Methodology & Architecture →
         </a>
-        <a href="results.html" class="nav-btn" style="padding: 14px 32px; font-size: 1rem; border-color: var(--accent-indigo); color: var(--accent-indigo); background: #ffffff;">
-          View Page 2: Benchmark Results & Figures →
+        <a href="results.html" class="nav-btn" style="padding: 13px 28px; font-size: 0.95rem; border-color: var(--accent-indigo); color: var(--accent-indigo); background: #ffffff;">
+          View Benchmark Results & Figures →
         </a>
       </div>
     </header>
 
-    <!-- Stat Highlights -->
+    <!-- Top Key Metric Cards -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-indigo);">85.84%</div>
         <div class="stat-label">Overall Test Accuracy</div>
-        <div class="stat-sub">Evaluated on 130,000 test samples</div>
+        <div class="stat-sub">Evaluated on 130,000 real test flows</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-emerald);">77.36%</div>
         <div class="stat-label">Macro F1-Score</div>
-        <div class="stat-sub">+1.59% over baseline</div>
+        <div class="stat-sub">↑ +1.59% over baseline</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-purple);">0.44 MB</div>
-        <div class="stat-label">Selective INT8 Disk Size</div>
-        <div class="stat-sub">Zero quantization accuracy loss</div>
+        <div class="stat-label">Quantized Model Footprint</div>
+        <div class="stat-sub">24.6% binary compression</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-amber);">6.08 ms</div>
         <div class="stat-label">CPU Per-Packet Latency</div>
-        <div class="stat-sub">Well below 50ms clinical budget</div>
+        <div class="stat-sub">Passed (&lt;50ms clinical limit)</div>
       </div>
     </div>
 
-    <!-- Quick Overview Grid -->
+    <!-- Section 1: The Core Problem -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🏥</span>
+        1. The Core Problem: Cyber Security in Medical IoMT Networks
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Modern hospital environments are increasingly reliant on connected <strong>Internet of Medical Things (IoMT)</strong> devices—such as automatic insulin pumps, wearable cardiac telemetry monitors, infusion gateways, and ICU ventilators. These devices monitor and control vital patient health functions in real time.
+      </p>
+
+      <div class="grid-2">
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 20px; border-radius: 12px; border-left: 4px solid var(--accent-rose);">
+          <h4 style="color: var(--accent-rose); font-family: var(--font-heading); margin-bottom: 6px; font-size: 1.05rem;">
+            Severe Hardware Constraints
+          </h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            Medical edge devices run on small batteries or low-power microcontrollers (e.g., ARM Cortex-M, ESP32, STM32) with tiny RAM memory (KBs) and weak CPUs. They cannot host heavy Deep Learning models or GPU hardware.
+          </p>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border-card); padding: 20px; border-radius: 12px; border-left: 4px solid var(--accent-amber);">
+          <h4 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 6px; font-size: 1.05rem;">
+            Lethal Attack Threat Vectors
+          </h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            IoMT networks face sophisticated attacks including DoS/DDoS floods, ARP spoofing, reconnaissance vulnerability scans, and MQTT telemetry exploits that can tamper with patient medication dosages or disrupt ICU monitors.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Existing Solutions & Their Flaws -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">⚠️</span>
+        2. Existing Solutions & Their Limitations
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Standard Machine Learning (ML) and Deep Reinforcement Learning (DRL) intrusion detection systems in academic literature (2024–2026) report over 95% macro accuracy. However, they suffer from fundamental real-world flaws:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Existing Solution Approach</th>
+              <th>How It Works</th>
+              <th>Critical Engineering Flaw</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Standard Machine Learning (Random Forest, XGBoost)</strong></td>
+              <td>Static supervised classification trained on offline tabular flow features</td>
+              <td>Inflexible to evolving network conditions; requires manual feature extraction; ignores sequential flow dependencies</td>
+            </tr>
+            <tr>
+              <td><strong>Standard Deep Learning (DNN, CNN, LSTM)</strong></td>
+              <td>Heavy deep neural networks trained with Cross-Entropy loss on server GPUs</td>
+              <td>High computational footprint (>5 MB model size); zero edge latency profiling; collapses on severe class imbalance</td>
+            </tr>
+            <tr>
+              <td><strong>Conventional DRL (Standard Flat DQN)</strong></td>
+              <td>DQN agent with flat reward function ($+1$ correct, $-1$ incorrect)</td>
+              <td>Prioritizes overall dataset accuracy by predicting common benign traffic, resulting in <strong>0.00% zero-detection recall on rare attacks</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Research Gaps Identified -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">🔍</span>
+        3. Identified Research Gaps (Gap A & Gap B)
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Our literature survey identified two fundamental research gaps in IoMT security engineering:
+      </p>
+
+      <div class="grid-2">
+        <div style="background: rgba(225, 29, 72, 0.04); border: 1px solid rgba(225, 29, 72, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-rose); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            Gap A: The Deployability Gap (Resource Unawareness)
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
+            Prior works evaluate models exclusively in high-resource GPU desktop/server environments and report <strong>no resource-cost metrics</strong> (such as single-core CPU latency per packet, peak RAM footprint, or model binary size). Whether these networks can run on resource-constrained medical edge gateways remains unverified in literature.
+          </p>
+        </div>
+
+        <div style="background: rgba(217, 119, 6, 0.04); border: 1px solid rgba(217, 119, 6, 0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: var(--accent-amber); font-family: var(--font-heading); margin-bottom: 10px; font-size: 1.1rem;">
+            Gap B: The Class Imbalance Blind Spot
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
+            Clinical IoMT network traffic is heavily imbalanced, dominated by normal (benign) traffic and massive DDoS floods. Stealthy, highly targeted attacks (e.g., ICMP floods, host discovery, MQTT exploits) represent a tiny fraction of total flows. Standard models achieve high overall accuracy while remaining <strong>completely blind (0% detection) to stealthy attacks</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Our Proposed Solution (RA-RL-IDS) -->
+    <section class="card">
+      <h2 class="card-title">
+        <span class="card-icon">💡</span>
+        4. Our Proposed Solution: The RA-RL-IDS Framework
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        To resolve both gaps simultaneously, we introduced <strong>RA-RL-IDS</strong> (Resource-Aware Reinforcement Learning Intrusion Detection System)—a class-imbalance-aware <strong>Dueling Double Deep Q-Network (D3QN)</strong> optimized for edge deployment using 5 integrated technical strategies:
+      </p>
+
+      <div class="strategy-list">
+
+        <div class="strategy-item">
+          <div class="strategy-num">1</div>
+          <div class="strategy-text">
+            <h4>Supervised Warm-Start Pretraining (15 Epochs)</h4>
+            <p>Pretrains the CNN-LSTM feature extractor for 15 epochs using Cross-Entropy loss ($76.08\%$ accuracy), preventing initial replay buffer corruption from random exploration noise.</p>
+          </div>
+        </div>
+
+        <div class="strategy-item">
+          <div class="strategy-num">2</div>
+          <div class="strategy-text">
+            <h4>Dueling Double Deep Q-Network Architecture (D3QN)</h4>
+            <p>Decouples scalar State Value $V(s)$ from Action Advantage $A(s,a)$ streams, preventing action-value overestimation across 19 attack categories.</p>
+          </div>
+        </div>
+
+        <div class="strategy-item">
+          <div class="strategy-num">3</div>
+          <div class="strategy-text">
+            <h4>Contextual DRL Formulation ($\gamma = 0.0$) & Epsilon Calibration</h4>
+            <p>Sets discount factor $\gamma = 0.0$ to model flow classification as a 1-step contextual bandit, bounding Q-values in $[-1, +1]$ logit margin space and decaying exploration smoothly from $\epsilon = 0.15 \to 0.01$.</p>
+          </div>
+        </div>
+
+        <div class="strategy-item">
+          <div class="strategy-num">4</div>
+          <div class="strategy-text">
+            <h4>Balanced Focal Reward Calibration</h4>
+            <p>Formulates rewards using normalized square-root inverse class weights $w_c = \sqrt{N/N_c}$, penalizing false negatives on rare attacks heavily without destabilizing majority benign traffic.</p>
+          </div>
+        </div>
+
+        <div class="strategy-item">
+          <div class="strategy-num">5</div>
+          <div class="strategy-text">
+            <h4>Selective Dynamic INT8 Quantization</h4>
+            <p>Quantizes strictly <code>nn.Linear</code> projection layers while preserving <code>nn.LSTM</code> recurrent parameters in FP32. Achieves <strong>0.44 MB file size</strong> and <strong>6.08 ms CPU latency</strong> with <strong>zero accuracy loss (85.84%)</strong>.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Quick Navigation Footer Grid -->
     <div class="grid-2">
-      <!-- Card 1 -->
       <a href="methodology.html" style="text-decoration: none;">
         <div class="card" style="height: 100%;">
-          <h2 class="card-title">
+          <h3 class="card-title" style="font-size: 1.2rem;">
             <span class="card-icon">📘</span>
-            Page 1: Methodology, Metrics & Architecture
-          </h2>
-          <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px;">
-            Detailed technical breakdown of the Gymnasium RL Environment formulation ($\langle S,A,P,R,\gamma \rangle$), D3QN Agent architecture, 5 integrated optimization strategies, and system interaction loop.
+            Explore Methodology & System Architecture
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 12px;">
+            Detailed breakdown of Gymnasium RL Environment MDP formulation, D3QN Agent architecture, SVG system interaction loops, and metric equations.
           </p>
-          <span style="color: var(--accent-indigo); font-weight: 700; font-size: 0.9rem;">View Methodology Page →</span>
+          <span style="color: var(--accent-indigo); font-weight: 700; font-size: 0.9rem;">Go to Methodology & Design →</span>
         </div>
       </a>
 
-      <!-- Card 2 -->
       <a href="results.html" style="text-decoration: none;">
         <div class="card" style="height: 100%;">
-          <h2 class="card-title">
+          <h3 class="card-title" style="font-size: 1.2rem;">
             <span class="card-icon">📊</span>
-            Page 2: Benchmark Results & Figures
-          </h2>
-          <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px;">
-            Interactive publication figure gallery with lightbox zoom, per-class recall improvement tables across 19 attack categories, CPU quantization benchmarks, and academic viva Q&A defense.
+            Explore Benchmark Results & Figures
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 12px;">
+            Interactive publication figure gallery with Lightbox zoom, per-class recall improvement tables across 19 attack classes, CPU benchmarks, and viva defense cheat sheet.
           </p>
-          <span style="color: var(--accent-blue); font-weight: 700; font-size: 0.9rem;">View Results & Figures Page →</span>
+          <span style="color: var(--accent-blue); font-weight: 700; font-size: 0.9rem;">Go to Results & Benchmarks →</span>
         </div>
       </a>
     </div>
